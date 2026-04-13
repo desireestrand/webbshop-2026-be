@@ -56,20 +56,26 @@ export async function logInUser(email, password){
 }
 
 export async function refreshAccessToken(refreshToken) {
-  
   const decodedToken = verifyRefreshToken(refreshToken)
-
-
   const userId = decodedToken?.userId
+
   if(!userId){
     throw new Error("Invalid refresh token")
   }
 
   const user = await getUserById(userId)
+
   if(!user){
     throw new Error("User not found")
   }
-  const accessToken = generateAccessToken(user)
+
+    const payload = { 
+    userId: user._id, 
+    role: user.role,
+    email: user.email 
+  };
+
+  const accessToken = generateAccessToken(payload)
   return{accessToken}
 }
 
