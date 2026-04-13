@@ -9,14 +9,16 @@ function _generateTokens(user){
 }
 
 function _getUserObject(user){
-  const userObject = user.toObject()
+/*   const userObject = user.toObject()
   delete userObject.password
-  return userObject
+  return userObject */
+  return user.toJSON();
 }
 
 export async function registerUser(name, email, password, location){
   const newUser = new User({name, email, password, location})
   await newUser.save()
+  
   const {accessToken, refreshToken} = _generateTokens(newUser)
 
   const userObject = _getUserObject(newUser)

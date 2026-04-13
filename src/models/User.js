@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    toJSON: { 
+    toJSON: {
       virtuals: true,
       transform: (doc, ret) => {
         delete ret._activeOwner;
@@ -55,56 +55,83 @@ const userSchema = new mongoose.Schema(
         delete ret.password;
         delete ret.id;
         return ret;
-      } },
-    toObject: { virtuals: true }
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: (doc, ret) => {
+        delete ret._activeOwner;
+        delete ret._activeRequester;
+        delete ret._completedOwner;
+        delete ret._completedRequester;
+        delete ret.password;
+        delete ret.id;
+        return ret;
+      },
+    },
   },
 );
 
 userSchema.virtual("plants", {
   ref: "Plant",
   localField: "_id",
-  foreignField: "ownerId"
+  foreignField: "ownerId",
 });
 
 userSchema.virtual("_activeOwner", {
   ref: "Trade",
   localField: "_id",
   foreignField: "ownerId",
-  match: { status: { $in: ["pending", "approved"] } }
+  match: { status: { $in: ["pending", "approved"] } },
 });
 
 userSchema.virtual("_activeRequester", {
   ref: "Trade",
   localField: "_id",
   foreignField: "requesterId",
-  match: { status: { $in: ["pending", "approved"] } }
-  
+  match: { status: { $in: ["pending", "approved"] } },
 });
 
 userSchema.virtual("_completedOwner", {
   ref: "Trade",
   localField: "_id",
   foreignField: "ownerId",
-  match: { status: "completed" }
+  match: { status: "completed" },
 });
 
 userSchema.virtual("_completedRequester", {
   ref: "Trade",
   localField: "_id",
   foreignField: "requesterId",
-  match: { status: "completed" }
+  match: { status: "completed" },
 });
 
-userSchema.virtual("activeTrades").get(function() {
+userSchema.virtual("activeTrades").get(function () {
   const owner = this._activeOwner || [];
   const requester = this._activeRequester || [];
-  return [...owner, ...requester].sort((a, b) => b.updatedAt - a.updatedAt);
+  const combined = [...owner, ...requester];
+
+  if (combined.length === 0) return [];
+
+  return combined.sort((a, b) => {
+    const dateA = a?.updatedAt || 0;
+    const dateB = b?.updatedAt || 0;
+    return dateB - dateA;
+  });
 });
 
-userSchema.virtual("history").get(function() {
+userSchema.virtual("history").get(function () {
   const owner = this._completedOwner || [];
   const requester = this._completedRequester || [];
-  return [...owner, ...requester].sort((a, b) => b.updatedAt - a.updatedAt);
+  const combined = [...owner, ...requester];
+
+  if (combined.length === 0) return [];
+
+  return combined.sort((a, b) => {
+    const dateA = a?.updatedAt || 0;
+    const dateB = b?.updatedAt || 0;
+    return dateB - dateA;
+  });
 });
 
 userSchema.pre("save", async function (next) {
@@ -125,23 +152,22 @@ userSchema.pre("save", async function (next) {
 
 userSchema.pre("validate", async function (next) {
   if (this.isModified("name")) {
-
     const baseSlug = slugify(this.name, {
       lower: true,
     });
 
-    console.log("baseSlug: ", baseSlug)
-    let slug = baseSlug
+    console.log("baseSlug: ", baseSlug);
+    let slug = baseSlug;
     //Kolla om slug redan finns
-    const Plant = this.constructor     // means const Plant = mongoose.model("Plant");
+    const User = this.constructor; // means const User = mongoose.model("Plant");
     let counter = 1;
-    //while slug exists in Plants, run this code
-    while(await Plant.exists({slug})){
-      slug = `${baseSlug}-${counter}`
-      counter++
+    //while slug exists in Users, run this code
+    while (await User.exists({ slug })) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
     }
     //change the value of slug, makes while-loop stop if new value does not exist
-    this.slug = slug
+    this.slug = slug;
   }
 
   return next();

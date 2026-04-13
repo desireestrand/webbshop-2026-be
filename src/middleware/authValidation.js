@@ -6,6 +6,7 @@ export const validateRegister = [
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
+  body("location").optional().isArray({ min: 2, max: 2 }).withMessage("Location must be an array of two coordinates"),
 ];
 
 export const validateAuthResult = (req, res, next) => {
