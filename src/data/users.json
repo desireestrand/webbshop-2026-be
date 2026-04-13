@@ -6,9 +6,7 @@
     "slug": "amara-okafor",
     "password": "SafePassword789!",
     "role": "admin",
-    "location": [59.3251, 18.0712],
-    "plants": ["65f1a2b3c4d5e6f7a8b9c101", "65f1a2b3c4d5e6f7a8b9c104"],
-    "history": ["65f1a2b3c4d5e6f7a8b9c203"]
+    "location": [59.3251, 18.0712]
   },
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c002",
@@ -17,9 +15,7 @@
     "email": "kim.n@gardenmail.com",
     "password": "GreenThumb2024",
     "role": "user",
-    "location": [59.3168, 18.0741],
-    "plants": ["65f1a2b3c4d5e6f7a8b9c102"],
-    "history": ["65f1a2b3c4d5e6f7a8b9c201"]
+    "location": [59.3168, 18.0741]
   },
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c003",
@@ -28,8 +24,6 @@
     "email": "mateo.rossi@provider.se",
     "password": "CactusLife456",
     "role": "user",
-    "location": [59.3210, 18.0585],
-    "plants": ["65f1a2b3c4d5e6f7a8b9c103", "65f1a2b3c4d5e6f7a8b9c105"],
-    "history": ["65f1a2b3c4d5e6f7a8b9c202"]
+    "location": [59.3210, 18.0585]
   }
 ]

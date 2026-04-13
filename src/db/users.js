@@ -13,20 +13,8 @@ export async function getUsers(q) {
 
   try {
     return await User.find(filter)
-      .populate("plants", "name")
-      .populate({
-        path: "history",
-        match: { status: "completed" },
-        populate: [
-          {
-            path: "plantId",
-            select: "name image species meetingTime coordinates available",
-          },
-          { path: "ownerId", select: "name email location" },
-          { path: "requesterId", select: "name email location" },
-        ],
-        options: { sort: { createdAt: -1 } },
-      });
+    .select("name email slug role location createdAt updatedAt")
+    .lean()
   } catch (err) {
     console.error("Unable to find based on query in 'Users'", err);
     return [];
@@ -34,26 +22,38 @@ export async function getUsers(q) {
 }
 
 export async function getUserById(id) {
+  const historyPopulate = {
+    populate: [
+      {
+        path: "plantId",
+        select: "name image species meetingTime coordinates available",
+      },
+      { path: "ownerId", select: "name email location" },
+      { path: "requesterId", select: "name email location" },
+    ],
+    options: { sort: { createdAt: -1 } },
+  };
+
   try {
     return await User.findById(id)
-      .select("name location")
+      .select("name email slug role location createdAt updatedAt")
+      .populate("plants","name image species meetingTime coordinates available")
       .populate({
-        path: "plants",
-        match: { available: true },
-      });
-    /* .populate({
-        path: "history",
-        match: { status: "completed" },
-        populate: [
-          {
-            path: "plantId",
-            select: "name image species meetingTime coordinates available",
-          },
-          { path: "ownerId", select: "name email location" },
-          { path: "requesterId", select: "name email location" },
-        ],
-        options: { sort: { createdAt: -1 } },
-      }); */
+        path: "_activeOwner",
+        ...historyPopulate,
+      })
+      .populate({
+        path: "_activeRequester",
+        ...historyPopulate,
+      })
+      .populate({
+        path: "_completedOwner",
+        ...historyPopulate,
+      })
+      .populate({
+        path: "_completedRequester",
+        ...historyPopulate,
+      })
   } catch (err) {
     console.error("Unable to read from 'Users'", err);
     return null;
@@ -63,24 +63,11 @@ export async function getUserById(id) {
 export async function getUserBySlug(slug) {
   try {
     return await User.findOne({ slug: slug })
-      .select("name location")
+      .select("name location").lean()
       .populate({
         path: "plants",
         match: { available: true },
       });
-/*       .populate({
-        path: "history",
-        match: { status: "completed" },
-        populate: [
-          {
-            path: "plantId",
-            select: "name image species meetingTime coordinates available",
-          },
-          { path: "ownerId", select: "name email location" },
-          { path: "requesterId", select: "name email location" },
-        ],
-        options: { sort: { createdAt: -1 } },
-      }); */
   } catch (err) {
     console.error("Unable to read from 'Users'", err);
   }
@@ -129,12 +116,6 @@ export async function deleteUserBySlug(slug) {
     console.error("Unable to delete 'User'", err);
     return false;
   }
-}
-
-export async function createUser(userData) {
-  const user = new User(userData);
-  await user.save();
-  return user;
 }
 
 export async function findUserByEmail(email) {

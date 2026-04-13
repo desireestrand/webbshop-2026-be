@@ -42,25 +42,70 @@ const userSchema = new mongoose.Schema(
       default: [0, 0],
       required: true,
     },
-    plants: [
-      {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: "Plant",
-        default: [],
-      },
-    ],
-    history: [
-      {
-        type: mongoose.SchemaTypes.ObjectId,
-        ref: "Trade",
-        default: [],
-      },
-    ],
   },
   {
     timestamps: true,
+    toJSON: { 
+      virtuals: true,
+      transform: (doc, ret) => {
+        delete ret._activeOwner;
+        delete ret._activeRequester;
+        delete ret._completedOwner;
+        delete ret._completedRequester;
+        delete ret.password;
+        delete ret.id;
+        return ret;
+      } },
+    toObject: { virtuals: true }
   },
 );
+
+userSchema.virtual("plants", {
+  ref: "Plant",
+  localField: "_id",
+  foreignField: "ownerId"
+});
+
+userSchema.virtual("_activeOwner", {
+  ref: "Trade",
+  localField: "_id",
+  foreignField: "ownerId",
+  match: { status: { $in: ["pending", "approved"] } }
+});
+
+userSchema.virtual("_activeRequester", {
+  ref: "Trade",
+  localField: "_id",
+  foreignField: "requesterId",
+  match: { status: { $in: ["pending", "approved"] } }
+  
+});
+
+userSchema.virtual("_completedOwner", {
+  ref: "Trade",
+  localField: "_id",
+  foreignField: "ownerId",
+  match: { status: "completed" }
+});
+
+userSchema.virtual("_completedRequester", {
+  ref: "Trade",
+  localField: "_id",
+  foreignField: "requesterId",
+  match: { status: "completed" }
+});
+
+userSchema.virtual("activeTrades").get(function() {
+  const owner = this._activeOwner || [];
+  const requester = this._activeRequester || [];
+  return [...owner, ...requester].sort((a, b) => b.updatedAt - a.updatedAt);
+});
+
+userSchema.virtual("history").get(function() {
+  const owner = this._completedOwner || [];
+  const requester = this._completedRequester || [];
+  return [...owner, ...requester].sort((a, b) => b.updatedAt - a.updatedAt);
+});
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
@@ -78,12 +123,27 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-userSchema.pre("validate", function (next) {
+userSchema.pre("validate", async function (next) {
   if (this.isModified("name")) {
-    this.slug = slugify(this.name, {
+
+    const baseSlug = slugify(this.name, {
       lower: true,
     });
+
+    console.log("baseSlug: ", baseSlug)
+    let slug = baseSlug
+    //Kolla om slug redan finns
+    const Plant = this.constructor     // means const Plant = mongoose.model("Plant");
+    let counter = 1;
+    //while slug exists in Plants, run this code
+    while(await Plant.exists({slug})){
+      slug = `${baseSlug}-${counter}`
+      counter++
+    }
+    //change the value of slug, makes while-loop stop if new value does not exist
+    this.slug = slug
   }
+
   return next();
 });
 

@@ -2,13 +2,15 @@ import { Router } from "express";
 import {
   validatePlant,
   validatePlantResult,
+  validatePlantUpdate,
 } from "../middleware/plantValidation.js";
 import {
   createPlant,
-  getPlants,
   getPlantBySlug,
   deletePlantBySlug,
   updatePlantBySlug,
+  getAvailablePlants,
+  getAllPlants,
 } from "../db/plants.js";
 
 const plantRouter = Router();
@@ -17,7 +19,16 @@ const plantRouter = Router();
 plantRouter.get("/", async (req, res) => {
   const { q } = req.query;
 
-  const plants = await getPlants(q);
+  const plants = await getAvailablePlants(q);
+
+  res.json(plants);
+});
+
+// GET /plants/all with search
+plantRouter.get("/all", async (req, res) => {
+  const { q } = req.query;
+
+  const plants = await getAllPlants(q);
 
   res.json(plants);
 });
@@ -37,7 +48,7 @@ plantRouter.get("/:slug", async (req, res) => {
 })
 
 // POST /plants
-plantRouter.post("/", async (req, res) => {
+plantRouter.post("/", validatePlant, validatePlantResult, async (req, res) => {
   // TODO Validation for User and Admin
   // validatePlant, validatePlantResult,
 
@@ -47,17 +58,11 @@ plantRouter.post("/", async (req, res) => {
 });
 
 // PUT /plants/:slug
-plantRouter.put("/:slug", async (req, res) => {
+plantRouter.put("/:slug", validatePlant, validatePlantResult, async (req, res) => {
   // TODO Validation for User (owner) and Admin
 
   const slug = req.params.slug;
-  const { name, image, species, lightLevels, coordinates, meetingTime } = req.body;
-
-  if (!name || !image || !species || !lightLevels || !coordinates || !meetingTime) {
-    return res.status(400).json({
-      message: "All fields (name, image, species, lightLevels, and meetingTime) are required",
-    });
-  }
+  const { name, image, species, lightLevels, coordinates, meetingTime, ownerId } = req.body;
 
   const updatedPlant = await updatePlantBySlug(slug, {
     name,
@@ -78,10 +83,10 @@ plantRouter.put("/:slug", async (req, res) => {
 });
 
 // PATCH /plants/:slug
-plantRouter.patch("/:slug", async (req, res) => {
+plantRouter.patch("/:slug", validatePlantUpdate, validatePlantResult, async (req, res) => {
   // TODO Validation for User (owner) and Admin
   const slug = req.params.slug
-  const updateData = req.body
+  const { ownerId, slug: bodySlug, ...updateData } = req.body
 
   const updatedPlant = await updatePlantBySlug(slug, updateData)
 

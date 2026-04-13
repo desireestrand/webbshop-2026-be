@@ -1,7 +1,7 @@
 import Plant from "../models/Plant.js";
 import { getFullTextSearch } from "../utils/fullTextSearch.js";
 
-export async function getPlants(q) {
+export async function getAvailablePlants(q) {
   let filter = { available: true };
 
   if (q) {
@@ -12,7 +12,25 @@ export async function getPlants(q) {
   }
 
   try {
-    return await Plant.find(filter).populate("ownerId", "name location");
+    return await Plant.find(filter).populate("ownerId", "name location").lean();
+  } catch (err) {
+    console.error("Unable to find based on query in 'Plants'", err);
+    return [];
+  }
+}
+
+export async function getAllPlants(q) {
+  let filter = { };
+
+  if (q) {
+    filter = {
+      ...filter,
+      ...getFullTextSearch(q, true, "name"),
+    };
+  }
+
+  try {
+    return await Plant.find(filter).populate("ownerId", "name location").lean();
   } catch (err) {
     console.error("Unable to find based on query in 'Plants'", err);
     return [];
@@ -21,7 +39,7 @@ export async function getPlants(q) {
 
 export async function getPlantBySlug(slug) {
   try {
-    return await Plant.findOne({ slug: slug }).populate("ownerId", "name location");
+    return await Plant.findOne({ slug: slug }).populate("ownerId", "name location").lean();
   } catch (err) {
     console.error("Unable to read from 'Plants'", err);
     return null;
@@ -43,6 +61,7 @@ export async function updatePlantBySlug(slug, plantData) {
   try {
     return await Plant.findOneAndUpdate({ slug: slug }, plantData, {
       new: true,
+      runValidators: true,
     });
   } catch (err) {
     console.error("Error Updating 'Plant':", err);

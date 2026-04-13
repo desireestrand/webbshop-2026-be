@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import slugify from "slugify";
 
 export const LIGHT_LEVELS = {
-  directSun: "directSun",
+  directSun: "direct sun",
   bright: "bright",
   partial: "partial",
   low: "low",
@@ -44,7 +44,7 @@ const plantSchema = new mongoose.Schema(
     },
     coordinates: {
       type: [Number],
-      default: [0, 0],
+      // default: [0, 0],
       required: true,
     },
     meetingTime: {
@@ -62,11 +62,25 @@ const plantSchema = new mongoose.Schema(
   },
 );
 
-plantSchema.pre("validate", function (next) {
+plantSchema.pre("validate", async function (next) {
   if (this.isModified("name")) {
-    this.slug = slugify(this.name, {
+
+    const baseSlug = slugify(this.name, {
       lower: true,
     });
+
+    console.log("baseSlug: ", baseSlug)
+    let slug = baseSlug
+    //Kolla om slug redan finns
+    const Plant = this.constructor     // means const Plant = mongoose.model("Plant");
+    let counter = 1;
+    //while slug exists in Plants, run this code
+    while(await Plant.exists({slug})){
+      slug = `${baseSlug}-${counter}`
+      counter++
+    }
+    //change the value of slug, makes while-loop stop if new value does not exist
+    this.slug = slug
   }
 
   return next();

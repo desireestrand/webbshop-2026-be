@@ -6,6 +6,7 @@ export const STATUS_LEVEL = {
   pending: "pending",
   approved: "approved",
   completed: "completed",
+  cancelled: "cancelled",
 };
 
 const tradeSchema = new mongoose.Schema(
@@ -32,6 +33,7 @@ const tradeSchema = new mongoose.Schema(
         STATUS_LEVEL.pending,
         STATUS_LEVEL.approved,
         STATUS_LEVEL.completed,
+        STATUS_LEVEL.cancelled,
       ],
       default: STATUS_LEVEL.pending,
     },
@@ -93,6 +95,26 @@ tradeSchema.post("save", async function () {
       console.error("Error updating user history:", err);
     }
   }
+  if (this.status === STATUS_LEVEL.cancelled) {
+    try {
+      await Plant.findByIdAndUpdate(this.plantId, { available: true });
+    } catch (err) {
+      console.error("Error updating plant availability:", err);
+    }
+  }
+
+  //Deletes all other trades with the same plant id if one trade is completed
+  if(this.status === STATUS_LEVEL.completed){
+    try{
+      await this.constructor.deleteMany({
+        plantId: this.plantId,
+        _id: {$ne: this._id},                 //makes sure not to delete the current trade
+        status:{$ne: STATUS_LEVEL.completed}  //makes sure not to delete trades with the status completed
+      })
+    }
+   catch (error) {
+    console.error("Could not clean up old trades for plantId " + this.plantId)
+  }}
 });
 
 const Trade = mongoose.model("Trade", tradeSchema);
