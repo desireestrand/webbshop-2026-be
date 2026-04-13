@@ -114,8 +114,8 @@ userSchema.virtual("activeTrades").get(function () {
   if (combined.length === 0) return [];
 
   return combined.sort((a, b) => {
-    const dateA = a?.updatedAt || 0;
-    const dateB = b?.updatedAt || 0;
+    const dateA = a && a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+    const dateB = b && b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
     return dateB - dateA;
   });
 });
@@ -128,8 +128,8 @@ userSchema.virtual("history").get(function () {
   if (combined.length === 0) return [];
 
   return combined.sort((a, b) => {
-    const dateA = a?.updatedAt || 0;
-    const dateB = b?.updatedAt || 0;
+    const dateA = a && a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+    const dateB = b && b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
     return dateB - dateA;
   });
 });

@@ -33,7 +33,7 @@ authRouter.post("/register",
       })
     } catch(error){
       console.log("Failed to register user", error) 
-      return res.status(400).json("User was not registerd")
+      return res.status(400).json({message: "User was not registerd", error: error.message})
     }
   }
 );

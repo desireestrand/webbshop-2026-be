@@ -3,8 +3,14 @@ import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from ".
 import { getUserById } from "./users.js"
 
 function _generateTokens(user){
-  const accessToken = generateAccessToken(user)
-  const refreshToken = generateRefreshToken(user)
+  const payload = { 
+    _id: user._id, 
+    role: user.role,
+    email: user.email 
+  };
+
+  const accessToken = generateAccessToken(payload)
+  const refreshToken = generateRefreshToken(payload)
   return {accessToken, refreshToken}
 }
 
