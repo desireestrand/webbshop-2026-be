@@ -4,7 +4,7 @@ import { getUserById } from "./users.js"
 
 function _generateTokens(user){
   const payload = { 
-    _id: user._id, 
+    userId: user._id, 
     role: user.role,
     email: user.email 
   };
