@@ -64,7 +64,7 @@ userRouter.put("/id/:id", async (req, res) => {
     return res.status(404).json({ message: "User not found" });
   }
 
-  res.json(user);
+  res.status(200).json(user);
 }); 
 
 // PUT /users/:slug
@@ -83,6 +83,19 @@ userRouter.put("/:slug", validateUpdateUser, async (req, res) => {
   }
 
   return res.status(200).json(updatedUser);
+});
+
+//PATCH /users/id/:id
+userRouter.patch("/id/:id", validateUpdateUser, async (req, res) => {
+  //kommer ha validering för user och admin
+  
+  const user = await updateUser(req.params.id, req.body);
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  res.status(200).json(user);
 });
 
 //PATCH /users/:slug
