@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { validateUpdateUser } from "../middleware/userValidation.js";
+import { Router } from "express"
+import { validateUpdateUser } from "../middleware/userValidation.js"
 import {
   getUsers,
   getUserById,
@@ -8,140 +8,149 @@ import {
   getUserBySlug,
   updateUserBySlug,
   deleteUserBySlug,
-} from "../db/users.js";
+} from "../db/users.js"
+import { requireAuth } from "../middleware/auth.js"
 
+const userRouter = Router()
 
-const userRouter = Router();
-
-userRouter.get("/", async (req, res) => {
+userRouter.get("/", requireAuth, async (req, res) => {
   // TODO Validation for Admin
 
-  const { q } = req.query;
+  const { q } = req.query
 
-  const users = await getUsers(q);
+  const users = await getUsers(q)
 
-  res.json(users);
-});
+  res.json(users)
+})
 
 // GET /users/id/:id
-userRouter.get("/id/:id", async (req, res) => {
+userRouter.get("/id/:id", requireAuth, async (req, res) => {
   // TODO Validation for User and Admin
-  const user = await getUserById(req.params.id);
+  const user = await getUserById(req.params.id)
 
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    return res.status(404).json({ message: "User not found" })
   }
 
-  res.json(user);
-});
+  res.json(user)
+})
 
 // GET /users/:slug
-userRouter.get("/:slug", async (req, res) => {
-  const user = await getUserBySlug(req.params.slug);
+userRouter.get("/:slug", requireAuth, async (req, res) => {
+  const user = await getUserBySlug(req.params.slug)
 
   if (!user) {
     return res.status(404).json({
       message: "User not found",
-    });
+    })
   }
 
-  res.json(user);
-});
+  res.json(user)
+})
 
 // POST /users
-userRouter.post("/", async (req, res) => {
-  const user = await createUser(req.body);
-  res.status(201).json(user);
-});
+userRouter.post("/", requireAuth, async (req, res) => {
+  const user = await createUser(req.body)
+  res.status(201).json(user)
+})
 
 // PUT /users/id/:id
-userRouter.put("/id/:id", async (req, res) => {
+userRouter.put("/id/:id", requireAuth, async (req, res) => {
   // TODO Validation for User
 
-  const user = await updateUser(req.params.id, req.body);
+  const user = await updateUser(req.params.id, req.body)
 
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    return res.status(404).json({ message: "User not found" })
   }
 
-  res.status(200).json(user);
-}); 
+  res.status(200).json(user)
+})
 
 // PUT /users/:slug
-userRouter.put("/:slug", validateUpdateUser, async (req, res) => {
+userRouter.put("/:slug", requireAuth, validateUpdateUser, async (req, res) => {
   //kommer ha validering för user och admin
 
-  const slug = req.params.slug;
-  const { name, email, location } = req.body;
+  const slug = req.params.slug
+  const { name, email, location } = req.body
 
   const updatedUser = await updateUserBySlug(slug, { name, email, location })
 
   if (!updatedUser) {
     return res.status(404).json({
       message: "User not found",
-    });
+    })
   }
 
-  return res.status(200).json(updatedUser);
-});
+  return res.status(200).json(updatedUser)
+})
 
 //PATCH /users/id/:id
-userRouter.patch("/id/:id", validateUpdateUser, async (req, res) => {
-  //kommer ha validering för user och admin
-  
-  const user = await updateUser(req.params.id, req.body);
+userRouter.patch(
+  "/id/:id",
+  requireAuth,
+  validateUpdateUser,
+  async (req, res) => {
+    //kommer ha validering för user och admin
 
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
+    const user = await updateUser(req.params.id, req.body)
 
-  res.status(200).json(user);
-});
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    res.status(200).json(user)
+  },
+)
 
 //PATCH /users/:slug
-userRouter.patch("/:slug", validateUpdateUser, async (req, res) => {
-  //kommer ha validering för user och admin
-  
+userRouter.patch(
+  "/:slug",
+  requireAuth,
+  validateUpdateUser,
+  async (req, res) => {
+    //kommer ha validering för user och admin
 
-  const slug = req.params.slug;
-  const { email, name, location } = req.body;
+    const slug = req.params.slug
+    const { email, name, location } = req.body
 
-  const updatedUser = await updateUserBySlug(slug, { email, name, location });
+    const updatedUser = await updateUserBySlug(slug, { email, name, location })
 
-  if (!updatedUser) {
-    return res.status(404).json({
-      message: "User does not exist",
-    });
-  }
+    if (!updatedUser) {
+      return res.status(404).json({
+        message: "User does not exist",
+      })
+    }
 
-  return res.status(200).json(updatedUser);
-});
+    return res.status(200).json(updatedUser)
+  },
+)
 
 // DELETE /users/id/:id
 userRouter.delete("/id/:id", async (req, res) => {
   // TODO Validation for Admin
 
-  const user = await deleteUser(req.params.id);
+  const user = await deleteUser(req.params.id)
 
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    return res.status(404).json({ message: "User not found" })
   }
 
-  res.status(204).json();
-});
+  res.status(204).json()
+})
 
 // DELETE /users/:slug
 userRouter.delete("/:slug", async (req, res) => {
   //kommer ha validering för user och admin
-  const slug = req.params.slug;
-  const user = await deleteUserBySlug(slug);
+  const slug = req.params.slug
+  const user = await deleteUserBySlug(slug)
   if (!user) {
     return res.status(400).json({
       message: "user does not exist",
-    });
+    })
   }
-  return res.status(204).json();
-});
+  return res.status(204).json()
+})
 
 // userRouter.put("/:id", async (req, res) => {
 //   const user = await updateUser(req.params.id, req.body)
@@ -170,4 +179,4 @@ userRouter.delete("/:slug", async (req, res) => {
 //   res.status(204).json()
 // })
 
-export default userRouter;
+export default userRouter
