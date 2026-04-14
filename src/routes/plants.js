@@ -12,7 +12,8 @@ import {
   getAvailablePlants,
   getAllPlants,
   getPlantsByOwnerId,
-} from "../db/plants.js"
+} from "../db/plants.js";
+import { requireAuth } from "../middleware/auth.js";
 
 const plantRouter = Router()
 
@@ -26,9 +27,9 @@ plantRouter.get("/", async (req, res) => {
 })
 
 // GET /plants/all with search
-plantRouter.get("/all", async (req, res) => {
-  const { q } = req.query
-
+plantRouter.get("/all", requireAuth, async (req, res) => {
+  const { q } = req.query;
+  
   const plants = await getAllPlants(q)
 
   res.json(plants)
@@ -48,8 +49,8 @@ plantRouter.get("/mine", async (req, res) => {
 })
 
 // GET /plants/:slug
-plantRouter.get("/:slug", async (req, res) => {
-  const slug = req.params.slug
+plantRouter.get("/:slug", requireAuth, async (req, res) => {
+  const slug = req.params.slug;
 
   const plant = await getPlantBySlug(slug)
 
@@ -58,46 +59,49 @@ plantRouter.get("/:slug", async (req, res) => {
       message: "Plant not found",
     })
   }
+
   res.json(plant)
 })
 
 // POST /plants
-plantRouter.post("/", validatePlant, validatePlantResult, async (req, res) => {
-  // TODO Validation for User and Admin
-  // validatePlant, validatePlantResult,
+plantRouter.post("/", requireAuth, validatePlant, validatePlantResult, async (req, res) => {
+  const plantData = {
+    ...req.body,
+    ownerId: req.userId 
+  };
 
-  const plant = await createPlant(req.body)
+  const plant = await createPlant(plantData);
 
   res.status(201).json(plant)
 })
 
 // PUT /plants/:slug
-plantRouter.put(
-  "/:slug",
-  validatePlant,
-  validatePlantResult,
+plantRouter.put("/:slug", requireAuth, validatePlant, validatePlantResult,
   async (req, res) => {
-    // TODO Validation for User (owner) and Admin
+  // TODO Validation for Admin
+  const slug = req.params.slug;
 
-    const slug = req.params.slug
-    const {
-      name,
-      image,
-      species,
-      lightLevels,
-      coordinates,
-      meetingTime,
-      ownerId,
-    } = req.body
+  const plant = await getPlantBySlug(slug);
 
-    const updatedPlant = await updatePlantBySlug(slug, {
-      name,
-      image,
-      species,
-      lightLevels,
-      coordinates,
-      meetingTime,
-    })
+   if(!plant){
+      return res.status(404).json({ message: "Plant not found" })
+  }
+
+  // Kontrollera att användaren äger plantan
+  if (plant.ownerId._id.toString() !== req.userId) {
+    return res.status(403).json({ message: "Not allowed to update this plant" })
+  }
+
+  const { name, image, species, lightLevels, coordinates, meetingTime } = req.body;
+
+  const updatedPlant = await updatePlantBySlug(slug, {
+    name,
+    image,
+    species,
+    lightLevels,
+    coordinates,
+    meetingTime,
+  });
 
     if (!updatedPlant) {
       return res.status(404).json({
@@ -110,14 +114,22 @@ plantRouter.put(
 )
 
 // PATCH /plants/:slug
-plantRouter.patch(
-  "/:slug",
-  validatePlantUpdate,
-  validatePlantResult,
-  async (req, res) => {
-    // TODO Validation for User (owner) and Admin
-    const slug = req.params.slug
-    const { ownerId, slug: bodySlug, ...updateData } = req.body
+plantRouter.patch("/:slug", requireAuth, validatePlantUpdate, validatePlantResult, async (req, res) => {
+  // TODO Validation for User (owner) and Admin
+  const slug = req.params.slug
+
+  const plant = await getPlantBySlug(slug);
+
+   if(!plant){
+      return res.status(404).json({ message: "Plant not found" })
+  }
+
+  // Kontrollera att användaren äger plantan
+  if (plant.ownerId._id.toString() !== req.userId) {
+    return res.status(403).json({ message: "Not allowed to update this plant" })
+  }
+
+  const { ownerId, slug: bodySlug, ...updateData } = req.body
 
     const updatedPlant = await updatePlantBySlug(slug, updateData)
 
@@ -132,13 +144,23 @@ plantRouter.patch(
 )
 
 // DELETE /plants/:slug
-plantRouter.delete("/:slug", async (req, res) => {
+plantRouter.delete("/:slug", requireAuth, async (req, res) => {
   // TODO Validation for User (owner) and Admin
 
   const slug = req.params.slug
 
-  const plant = await deletePlantBySlug(slug)
-
+  const findPlant = await getPlantBySlug(slug);
+  
+  if(!findPlant){
+    return res.status(404).json({ message: "Plant not found" })
+  }
+  
+  // Kontrollera att användaren äger plantan
+  if (findPlant.ownerId._id.toString() !== req.userId) {
+    return res.status(403).json({ message: "Not allowed to delete this plant" })
+  }
+  const plant = await deletePlantBySlug(slug);
+  
   if (!plant) {
     return res.status(400).json({
       message: "Plant does not exist",

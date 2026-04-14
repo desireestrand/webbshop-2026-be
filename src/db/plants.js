@@ -49,7 +49,7 @@ export async function getPlantsByOwnerId(ownerId) {
   }
 }
 
-export async function getPlantBySlug(slug) {
+export async function getPlantBySlug(slug){
   try {
     return await Plant.findOne({ slug: slug })
       .populate("ownerId", "name location")

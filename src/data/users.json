@@ -4,7 +4,7 @@
     "name": "Amara Okafor",
     "email": "amara.okafor@example.com",
     "slug": "amara-okafor",
-    "password": "SafePassword789!",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "admin",
     "location": [59.3251, 18.0712]
   },
@@ -13,7 +13,7 @@
     "name": "Kim Nguyen",
     "email": "kim.n@gardenmail.com",
     "slug": "kim-nguyen",
-    "password": "GreenThumb2024",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "user",
     "location": [59.3168, 18.0741]
   },
@@ -22,7 +22,7 @@
     "name": "Mateo Rossi",
     "email": "mateo.rossi@provider.se",
     "slug": "mateo-rossi",
-    "password": "CactusLife456",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "user",
     "location": [59.3210, 18.0585]
   },
@@ -31,7 +31,7 @@
     "name": "Linnéa Björk",
     "email": "linnea.b@vaxtpost.se",
     "slug": "linnea-bjork",
-    "password": "PasswordLeaf123!",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "user",
     "location": [59.3412, 18.0210]
   },
@@ -40,7 +40,7 @@
     "name": "Erik Sandqvist",
     "email": "erik.sand@hmail.com",
     "slug": "erik-sandqvist",
-    "password": "DesertCactus99",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "user",
     "location": [59.3350, 18.0820]
   }
