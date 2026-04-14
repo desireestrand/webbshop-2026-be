@@ -26,7 +26,7 @@ function _getUserObject(user) {
 }
 
 export async function registerUser(name, email, password, location) {
-  const newUser = new User({ name, email, password, location })
+  const newUser = new User({ name, email, password, location, role: "user" })
   await newUser.save()
 
   const { accessToken, refreshToken } = _generateTokens(newUser)
