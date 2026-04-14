@@ -8,14 +8,12 @@ import {
   getUserBySlug,
   updateUserBySlug,
   deleteUserBySlug,
-} from "../db/users.js"
-import { requireAuth } from "../middleware/auth.js"
+} from "../db/users.js";
+import { requireAuth, requireAdmin } from "../middleware/auth.js";
 
 const userRouter = Router()
 
-userRouter.get("/", requireAuth, async (req, res) => {
-  // TODO Validation for Admin
-
+userRouter.get("/", requireAuth, requireAdmin, async (req, res) => {
   const { q } = req.query
 
   const users = await getUsers(q)
@@ -24,8 +22,7 @@ userRouter.get("/", requireAuth, async (req, res) => {
 })
 
 // GET /users/id/:id
-userRouter.get("/id/:id", requireAuth, async (req, res) => {
-  // TODO Validation for User and Admin
+userRouter.get("/id/:id", requireAuth, requireAdmin, async (req, res) => {
   const user = await getUserById(req.params.id)
 
   if (!user) {
@@ -56,8 +53,6 @@ userRouter.post("/", requireAuth, async (req, res) => {
 
 // PUT /users/id/:id
 userRouter.put("/id/:id", requireAuth, async (req, res) => {
-  // TODO Validation for User
-
   const user = await updateUser(req.params.id, req.body)
 
   if (!user) {
@@ -69,8 +64,6 @@ userRouter.put("/id/:id", requireAuth, async (req, res) => {
 
 // PUT /users/:slug
 userRouter.put("/:slug", requireAuth, validateUpdateUser, async (req, res) => {
-  //kommer ha validering för user och admin
-
   const slug = req.params.slug
   const { name, email, location } = req.body
 
@@ -91,8 +84,6 @@ userRouter.patch(
   requireAuth,
   validateUpdateUser,
   async (req, res) => {
-    //kommer ha validering för user och admin
-
     const user = await updateUser(req.params.id, req.body)
 
     if (!user) {
@@ -109,8 +100,6 @@ userRouter.patch(
   requireAuth,
   validateUpdateUser,
   async (req, res) => {
-    //kommer ha validering för user och admin
-
     const slug = req.params.slug
     const { email, name, location } = req.body
 
@@ -128,8 +117,6 @@ userRouter.patch(
 
 // DELETE /users/id/:id
 userRouter.delete("/id/:id", async (req, res) => {
-  // TODO Validation for Admin
-
   const user = await deleteUser(req.params.id)
 
   if (!user) {
@@ -141,7 +128,6 @@ userRouter.delete("/id/:id", async (req, res) => {
 
 // DELETE /users/:slug
 userRouter.delete("/:slug", async (req, res) => {
-  //kommer ha validering för user och admin
   const slug = req.params.slug
   const user = await deleteUserBySlug(slug)
   if (!user) {

@@ -13,7 +13,6 @@ export const validateTradeResult = (req, res, next) => {
 
 export const validateCreateTrade = [
   body("plantId").isMongoId().withMessage("A valid plantId is required"),
-  body("requesterId").isMongoId().withMessage("A valid requesterId is required"),
   validateTradeResult
 ];
 

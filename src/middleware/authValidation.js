@@ -1,4 +1,4 @@
-import { body, validationResult } from "express-validator";
+import { body, query, validationResult } from "express-validator";
 
 export const validateRegister = [
   body("name").notEmpty().trim().withMessage("Name is required"),
@@ -8,6 +8,17 @@ export const validateRegister = [
     .withMessage("Password must be at least 6 characters"),
   body("location").optional().isArray({ min: 2, max: 2 }).withMessage("Location must be an array of two coordinates"),
 ];
+
+export const validateLogin = [
+  body("email").isEmail().normalizeEmail().withMessage("Valid email is required"),
+  body("password").notEmpty().withMessage("Password is required")
+]
+
+export const validateResetPassword = [
+  query("email").isEmail().normalizeEmail().withMessage("Valid email is required"),
+  query("code").notEmpty().withMessage("Reset code is required"),
+  body("password").isLength({ min: 6 }).withMessage("The new password must be at least 6 characters")
+]
 
 export const validateAuthResult = (req, res, next) => {
   const errors = validationResult(req);
