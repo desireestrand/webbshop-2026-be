@@ -9,11 +9,12 @@ import {
   updateUserBySlug,
   deleteUserBySlug,
 } from "../db/users.js";
+import { requireAdmin, requireAuth } from "../middleware/auth.js";
 
 
 const userRouter = Router();
 
-userRouter.get("/", async (req, res) => {
+userRouter.get("/", requireAuth, requireAdmin, async (req, res) => {
   // TODO Validation for Admin
 
   const { q } = req.query;
@@ -24,7 +25,7 @@ userRouter.get("/", async (req, res) => {
 });
 
 // GET /users/id/:id
-userRouter.get("/id/:id", async (req, res) => {
+userRouter.get("/id/:id", requireAuth, requireAdmin, async (req, res) => {
   // TODO Validation for User and Admin
   const user = await getUserById(req.params.id);
 

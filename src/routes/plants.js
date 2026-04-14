@@ -13,7 +13,7 @@ import {
   getAllPlants,
   getPlantsByOwnerId,
 } from "../db/plants.js";
-import { requireAuth } from "../middleware/auth.js";
+import { requireAdmin, requireAuth } from "../middleware/auth.js";
 
 const plantRouter = Router()
 
@@ -27,7 +27,7 @@ plantRouter.get("/", async (req, res) => {
 })
 
 // GET /plants/all with search
-plantRouter.get("/all", requireAuth, async (req, res) => {
+plantRouter.get("/all", requireAuth, requireAdmin, async (req, res) => {
   const { q } = req.query;
   
   const plants = await getAllPlants(q)
