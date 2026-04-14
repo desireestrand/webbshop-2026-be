@@ -55,9 +55,10 @@ tradeRouter.get("/mine", requireAuth, requireAdmin, async (req, res) => {
 })
 
 // POST /trades
-tradeRouter.post("/", validateCreateTrade, async (req, res) => {
+tradeRouter.post("/", requireAuth, validateCreateTrade, async (req, res) => {
   // TODO Validation for User (ownerId !== requesterId) and Admin
-  const { plantId, requesterId } = req.body
+  const requesterId = req.userId
+  const { plantId } = req.body;
 
   const trade = await createTrade({ plantId, requesterId })
 
@@ -65,37 +66,62 @@ tradeRouter.post("/", validateCreateTrade, async (req, res) => {
 })
 
 // TODO PATCH /trades/:id/status
-tradeRouter.patch(
-  "/:id/status",
-  validateUpdateTradeStatus,
-  async (req, res) => {
-    // TODO Validation for User (owner) and Admin
-    try {
-      const id = req.params.id
-      const status = req.body.status
+tradeRouter.patch("/:id/status", requireAuth, validateUpdateTradeStatus, async (req, res) => {
+  // TODO Validation for User (owner) and Admin
+  try {
+    const id = req.params.id;
+    const status = req.body.status;
+    
+    const trade = await getTradeById(id)
+    
+    if(!trade){
+      return res.status(404).json({
+        message: "Trade not found",
+      });
+    }
+    
+    // Kontrollera att användaren är en del av trade
+    if (trade.ownerId._id.toString() !== req.userId && trade.requesterId._id.toString() !== req.userId ) {
+      return res.status(403).json({ message: "Not allowed to update trade" })
+    }
+    
+    //Gör så att requestaren bara kan uppdatera till cancelled
+    if(trade.requesterId._id.toString() === req.userId && status !== "cancelled"){
+      return res.status(403).json({ message: "Not allowed to update trade" })
+    }
+    const updatedTrade = await updateTrade(id, { status })
 
-      const updatedTrade = await updateTrade(id, { status })
-
-      if (!updatedTrade) {
-        return res.status(404).json({
-          message: "Trade does not exist",
-        })
-      }
-
-      return res.status(200).json(updatedTrade)
-    } catch (err) {
+    if (!updatedTrade) {
+      return res.status(404).json({
+      message: "Trade does not exist",
+     });
+    } 
+    return res.status(200).json(updatedTrade)
+  }catch (err) {
       return res.status(400).json({ message: err.message })
     }
-  },
-)
+})
 
 // DELETE /trades/:id
-tradeRouter.delete("/:id", validateIdParam, async (req, res) => {
+tradeRouter.delete("/:id", requireAuth, validateIdParam, async (req, res) => {
   // TODO Validation for User (requester) and Admin
 
   const id = req.params.id
 
-  const deleted = await deleteTrade(id)
+  const trade = await getTradeById(id)
+
+    if(!trade){
+      return res.status(404).json({
+        message: "Trade not found",
+      });
+    }
+
+  // Kontrollera att användaren äger trade
+  if (trade.ownerId._id.toString() !== req.userId && trade.requesterId._id.toString() !== req.userId) {
+    return res.status(403).json({ message: "Not allowed to delete trade" })
+  }
+
+  const deleted = await deleteTrade(id);
 
   if (!deleted) {
     return res.status(404).json({
