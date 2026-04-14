@@ -2,6 +2,8 @@ import { Router } from "express"
 import {
   validateRegister,
   validateAuthResult,
+  validateLogin,
+  validateResetPassword,
 } from "../middleware/authValidation.js"
 import { 
   findUserByEmail, 
@@ -73,71 +75,44 @@ try {
 })
 
 // POST /auth/register
-authRouter.post(
-  "/register",
-  validateRegister,
-  validateAuthResult,
-  async (req, res) => {
-    try {
-      const { name, email, password, location } = req.body
+authRouter.post("/register", validateRegister, validateAuthResult, async (req, res) => {
+  try {
+    const { name, email, password, location } = req.body;
+    // Checking if email is already registered
+    const existingUser = await findUserByEmail(email);
 
-      //Checking if email is already registerd
-      const existingUser = await findUserByEmail(email)
-      if (existingUser) {
-        return res.status(409).json({ error: "Email already registerd" })
-      }
+    if (existingUser) {
+      return res.status(409).json({ error: "Email already registered" });
+    }
 
-      //Sending name, email, password and location to registerUser function and getting back user, accessToken and refreshToken
-      const { user, accessToken, refreshToken } = await registerUser(
-        name,
-        email,
-        password,
-        location,
-      )
-
-      return res.status(201).json({
-        user,
-        accessToken,
-        refreshToken,
-      })
-    } catch (error) {
-      console.log("Failed to register user", error)
-      return res
-        .status(400)
-        .json({ message: "User was not registerd", error: error.message })
+    // Sending name, email, password and location to registerUser function and getting back user, accessToken and refreshToken
+    const { user, accessToken, refreshToken } = await registerUser(name, email, password, location);
+    return res.status(201).json({ user, accessToken, refreshToken });
+  } catch (error) {
+    console.log("Failed to register user", error);
+    return res.status(400).json({ message: "User was not registered", error: error.message });
     }
   },
 )
 
 // TODO POST /auth/login
-authRouter.post("/login", async (req, res) => {
-  const { email, password } = req.body
-
+authRouter.post("/login", validateLogin, validateAuthResult, async (req, res) => {
   try {
-    //Sending email and password to logInUser function and getting back user, accessToken and refreshToken
-    const { user, accessToken, refreshToken } = await logInUser(email, password)
-
-    return res.json({
-      user,
-      accessToken,
-      refreshToken,
-    })
+    const { email, password } = req.body;
+    // Sending email and password to logInUser function and getting back user, accessToken and refreshToken
+    const { user, accessToken, refreshToken } = await logInUser(email, password);
+    return res.json({ user, accessToken, refreshToken });
   } catch (error) {
-    console.log("Error in login", error)
-    return res.status(401).json({
-      message: "Invalid credentials",
-    })
+    console.log("Error in login", error);
+    return res.status(401).json({ message: "Invalid credentials" });
   }
-})
+});
 
 //TODO POST /auth/refresh
 authRouter.post("/refresh", async (req, res) => {
-  const { refreshToken } = req.body
+  const { refreshToken } = req.body;
 
-  if (!refreshToken)
-    return res.status(401).json({
-      message: "Refresh token is required",
-    })
+  if (!refreshToken) return res.status(401).json({ message: "Refresh token is required" });
 
   try {
     const decodedToken = verifyRefreshToken(refreshToken)
@@ -146,10 +121,9 @@ authRouter.post("/refresh", async (req, res) => {
     if (!userId) {
       throw new Error()
     }
-    const { accessToken } = await refreshAccessToken(refreshToken)
-    return res.json({
-      accessToken,
-    })
+
+    const { accessToken } = await refreshAccessToken(refreshToken);
+    return res.json({ accessToken });
   } catch (error) {
     return res.status(401).json({
       message: "Unauthorized",
@@ -169,7 +143,7 @@ authRouter.post("/reset-password/request", async (req, res) => {
   return res.json(result)
 })
 
-authRouter.patch("/reset-password/confirm", async (req, res) => {
+authRouter.patch("/reset-password/confirm", validateResetPassword, validateAuthResult, async (req, res) => {
   const { email, code } = req.query
   if (!email || !code) {
     return res.status(400).json({
