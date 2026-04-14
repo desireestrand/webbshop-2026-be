@@ -12,11 +12,12 @@ import {
   validateIdParam,
   validateUpdateTradeStatus,
 } from "../middleware/tradeValidation.js"
+import { requireAdmin, requireAuth } from "../middleware/auth.js"
 
 const tradeRouter = Router()
 
 // GET /trades
-tradeRouter.get("/", async (req, res) => {
+tradeRouter.get("/", requireAuth, requireAdmin, async (req, res) => {
   // TODO Validation for Admin
   const trades = await getAllTrades()
 
@@ -24,7 +25,7 @@ tradeRouter.get("/", async (req, res) => {
 })
 
 // GET /trades/:id
-tradeRouter.get("/:id", validateIdParam, async (req, res) => {
+tradeRouter.get("/:id", requireAuth, requireAdmin, validateIdParam, async (req, res) => {
   // TODO Validation for Admin
 
   const id = req.params.id
@@ -41,7 +42,7 @@ tradeRouter.get("/:id", validateIdParam, async (req, res) => {
 
 // GET /trades/mine
 // TODO Validation for User and Admin
-tradeRouter.get("/mine", async (req, res) => {
+tradeRouter.get("/mine", requireAuth, requireAdmin, async (req, res) => {
   const myTrades = await getTradesByOwnerId(req.userId)
 
   if (!myTrades) {
