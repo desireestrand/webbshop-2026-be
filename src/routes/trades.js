@@ -91,13 +91,12 @@ tradeRouter.patch("/:id/status", requireAuth, validateUpdateTradeStatus, async (
       return res.status(404).json({
       message: "Trade does not exist",
      });
-
-      return res.status(200).json(updatedTrade)
-    } catch (err) {
+    } 
+    return res.status(200).json(updatedTrade)
+  }catch (err) {
       return res.status(400).json({ message: err.message })
     }
-  },
-)
+})
 
 // DELETE /trades/:id
 tradeRouter.delete("/:id", requireAuth, validateIdParam, async (req, res) => {
