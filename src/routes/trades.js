@@ -1,54 +1,65 @@
-import { Router } from "express";
+import { Router } from "express"
 import {
   getAllTrades,
   getTradeById,
   createTrade,
   deleteTrade,
   updateTrade,
+  getTradesByOwnerId,
 } from "../db/trades.js";
 import { validateCreateTrade, validateIdParam, validateUpdateTradeStatus } from "../middleware/tradeValidation.js";
 import { requireAuth } from "../middleware/auth.js";
 
-const tradeRouter = Router();
+const tradeRouter = Router()
 
 // GET /trades
 tradeRouter.get("/", requireAuth, async (req, res) => {
   // TODO Validation for Admin
-  const trades = await getAllTrades();
+  const trades = await getAllTrades()
 
-  res.json(trades);
-});
+  res.json(trades)
+})
 
 // GET /trades/:id
 tradeRouter.get("/:id", requireAuth, validateIdParam, async (req, res) => {
   // TODO Validation for Admin
 
-  const id = req.params.id;
-  const trade = await getTradeById(id);
+  const id = req.params.id
+  const trade = await getTradeById(id)
 
   if (!trade) {
     return res.status(404).json({
       message: "Trade not found",
-    });
+    })
   }
 
-  res.json(trade);
-});
+  res.json(trade)
+})
 
-// TODO GET /trades/mine
+// GET /trades/mine
 // TODO Validation for User and Admin
+tradeRouter.get("/mine", async (req, res) => {
+  const myTrades = await getTradesByOwnerId(req.userId)
+
+  if (!myTrades) {
+    return res.status(404).json({
+      message: "Your trades not found",
+    })
+  }
+
+  res.json(myTrades)
+})
 
 // POST /trades
 tradeRouter.post("/", requireAuth, validateCreateTrade, async (req, res) => {
   // TODO Validation for User (ownerId !== requesterId) and Admin
-
   const requesterId = req.userId
   const { plantId } = req.body;
 
-  const trade = await createTrade({ plantId, requesterId });
+  const trade = await createTrade({ plantId, requesterId })
 
-  res.status(201).json(trade);
-});
+  res.status(201).json(trade)
+})
 
 // TODO PATCH /trades/:id/status
 tradeRouter.patch("/:id/status", requireAuth, validateUpdateTradeStatus, async (req, res) => {
@@ -80,19 +91,19 @@ tradeRouter.patch("/:id/status", requireAuth, validateUpdateTradeStatus, async (
       return res.status(404).json({
       message: "Trade does not exist",
      });
-    }
 
-    return res.status(200).json(updatedTrade)
-  } catch (err) {
-    return res.status(400).json({ message: err.message })
-  }
-})
+      return res.status(200).json(updatedTrade)
+    } catch (err) {
+      return res.status(400).json({ message: err.message })
+    }
+  },
+)
 
 // DELETE /trades/:id
 tradeRouter.delete("/:id", requireAuth, validateIdParam, async (req, res) => {
   // TODO Validation for User (requester) and Admin
 
-  const id = req.params.id;
+  const id = req.params.id
 
   const trade = await getTradeById(id)
 
@@ -112,10 +123,10 @@ tradeRouter.delete("/:id", requireAuth, validateIdParam, async (req, res) => {
   if (!deleted) {
     return res.status(404).json({
       message: "Trade does not exist",
-    });
+    })
   }
 
-  return res.status(204).json();
-});
+  return res.status(204).json()
+})
 
-export default tradeRouter;
+export default tradeRouter
