@@ -3,7 +3,11 @@ import {
   validateRegister,
   validateAuthResult,
 } from "../middleware/authValidation.js"
-import { findUserByEmail } from "../db/users.js"
+import { 
+  findUserByEmail, 
+  updateUser, 
+  deleteUser,
+} from "../db/users.js"
 import {
   confirmPasswordReset,
   getAllOfMe,
@@ -13,6 +17,7 @@ import {
   requestPassword,
 } from "../db/auth.js"
 import { verifyRefreshToken } from "../utils/tokens.js"
+import { validateUpdateUser } from "../middleware/userValidation.js"
 
 const authRouter = Router()
 
@@ -23,6 +28,48 @@ authRouter.get("/me", async (req, res) => {
   const users = await getAllOfMe(q)
 
   res.json(users)
+})
+
+// PATCH/auth/me
+authRouter.patch("/me", /*requireAuth,*/ validateUpdateUser, async (req,res) => {
+  try {
+    // Get the logged in user's ID from the auth middleware (added when requireAuth is implemented)
+    const userId = req.user._id 
+
+    const { name, email, location } = req.body
+
+    const updatedUser = await updateUser(userId, { name, email, location})
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        message: "User not found"})
+    }
+
+    return res.status(200).json(updatedUser)
+
+  } catch (err) {
+    return res.status(401).json({ message: "Unauthorized" })
+  }
+})
+
+
+
+// DELETE / auth / me
+authRouter.delete("/me", /*requireAuth,*/ async (req, res) => {
+try {
+  // Get the logged in user's ID from the auth middleware
+  const userId = req.user._id 
+
+  const deleted = await deleteUser(userId)
+
+  if (!deleted) {
+    return res.status(404).json({
+      message: "User not found"})
+  }
+  return res.status(204).json()
+} catch (err) {
+  return res.status(401).json({ message: "Unauthorized" })
+}
 })
 
 // POST /auth/register
