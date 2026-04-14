@@ -1,106 +1,110 @@
 import User from "../models/User.js"
-import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/tokens.js"
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} from "../utils/tokens.js"
 import { getUserById } from "./users.js"
 
-function _generateTokens(user){
-  const payload = { 
-    userId: user._id, 
+function _generateTokens(user) {
+  const payload = {
+    userId: user._id,
     role: user.role,
-    email: user.email 
-  };
+    email: user.email,
+  }
 
   const accessToken = generateAccessToken(payload)
   const refreshToken = generateRefreshToken(payload)
-  return {accessToken, refreshToken}
+  return { accessToken, refreshToken }
 }
 
-function _getUserObject(user){
-/*   const userObject = user.toObject()
+function _getUserObject(user) {
+  /*   const userObject = user.toObject()
   delete userObject.password
   return userObject */
-  return user.toJSON();
+  return user.toJSON()
 }
 
-export async function registerUser(name, email, password, location){
-  const newUser = new User({name, email, password, location})
+export async function registerUser(name, email, password, location) {
+  const newUser = new User({ name, email, password, location })
   await newUser.save()
-  
-  const {accessToken, refreshToken} = _generateTokens(newUser)
+
+  const { accessToken, refreshToken } = _generateTokens(newUser)
 
   const userObject = _getUserObject(newUser)
 
-  return { user: userObject, accessToken, refreshToken}
+  return { user: userObject, accessToken, refreshToken }
 }
 
-export async function logInUser(email, password){
-    const user = await User.findOne({email: email.toLowerCase()}).select(
-      "+password" //gör så att man ska kunna få password
-    )
-  
-    const response = "Invalid credentials"
-  
-    if(!user){
-      throw new Error(response)
-    }
-  
-    const isSamePassword = await user.isSamePassword(password)
-  
-    if(!isSamePassword){
-      throw new Error(response)
-    }
-  
-    const {accessToken, refreshToken} = _generateTokens(user)
-    const userObject = _getUserObject(user)
+export async function logInUser(email, password) {
+  const user = await User.findOne({ email: email.toLowerCase() }).select(
+    "+password", //gör så att man ska kunna få password
+  )
 
-    return {user: userObject, accessToken, refreshToken}
+  const response = "Invalid credentials"
+
+  if (!user) {
+    throw new Error(response)
+  }
+
+  const isSamePassword = await user.isSamePassword(password)
+
+  if (!isSamePassword) {
+    throw new Error(response)
+  }
+
+  const { accessToken, refreshToken } = _generateTokens(user)
+  const userObject = _getUserObject(user)
+
+  return { user: userObject, accessToken, refreshToken }
 }
 
 export async function refreshAccessToken(refreshToken) {
   const decodedToken = verifyRefreshToken(refreshToken)
   const userId = decodedToken?.userId
 
-  if(!userId){
+  if (!userId) {
     throw new Error("Invalid refresh token")
   }
 
   const user = await getUserById(userId)
 
-  if(!user){
+  if (!user) {
     throw new Error("User not found")
   }
 
-    const payload = { 
-    userId: user._id, 
+  const payload = {
+    userId: user._id,
     role: user.role,
-    email: user.email 
-  };
+    email: user.email,
+  }
 
   const accessToken = generateAccessToken(payload)
-  return{accessToken}
+  return { accessToken }
 }
 
-export async function requestPassword(email = ""){
+export async function requestPassword(email = "") {
   await User.findOneAndUpdate(
     {
-      email: email.toLowerCase()
+      email: email.toLowerCase(),
     },
     {
-      resetPasswordCode: `${Math.floor(Math.random() * 100000)}`
-    }
+      resetPasswordCode: `${Math.floor(Math.random() * 100000)}`,
+    },
   )
 
   return {
-    message: "If the email exists, a reset code has been sent"
+    message: "If the email exists, a reset code has been sent",
   }
 }
 
-export async function confirmPasswordReset( email, code, newPassword){
+export async function confirmPasswordReset(email, code, newPassword) {
   const user = await User.findOne({
     email: email.toLowerCase(),
     resetPasswordCode: code,
   })
 
-  if(!user){
+  if (!user) {
     throw new Error("Unauthorized")
   }
 
@@ -108,7 +112,33 @@ export async function confirmPasswordReset( email, code, newPassword){
   user.resetPasswordCode = null
   await user.save()
 
-  return{
-    message: "Password has been reset"
+  return {
+    message: "Password has been reset",
+  }
+}
+
+export async function getAllOfMe(q) {
+  let filter = {}
+
+  if (q) {
+    filter = {
+      ...filter,
+      ...getFullTextSearch(q, true, "name"),
+    }
+  }
+
+  try {
+    const users = await User.find(filter)
+      .select("id name email slug role location createdAt updatedAt")
+      .populate("plants")
+      .populate("_activeOwner")
+      .populate("_activeRequester")
+      .populate("_completedOwner")
+      .populate("_completedRequester")
+
+    return users
+  } catch (err) {
+    console.error("Unable to find based on query in 'Users'", err)
+    return []
   }
 }
