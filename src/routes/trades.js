@@ -71,16 +71,16 @@ tradeRouter.post("/", /* requireAuth, */ validateCreateTrade, async (req, res) =
 tradeRouter.patch("/:id/status", /* requireAuth, */ validateUpdateTradeStatus, async (req, res) => {
   // TODO Validation for User (owner) and Admin
   try {
-    /* const id = req.params.id;
-    const status = req.body.status; */
+    const id = req.params.id;
+    const status = req.body.status;
     
-    const trade = await getTradeById(id)
+    // const trade = await getTradeById(id)
     
-    if(!trade){
-      return res.status(404).json({
-        message: "Trade not found",
-      });
-    }
+    // if(!trade){
+    //   return res.status(404).json({
+    //     message: "Trade not found",
+    //   });
+    // }
     
     // Kontrollera att användaren är en del av trade
    /* if (trade.ownerId._id.toString() !== req.userId && trade.requesterId._id.toString() !== req.userId && req.userRole !== "admin") {
