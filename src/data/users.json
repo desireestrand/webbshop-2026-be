@@ -4,26 +4,44 @@
     "name": "Amara Okafor",
     "email": "amara.okafor@example.com",
     "slug": "amara-okafor",
-    "password": "SafePassword789!",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "admin",
     "location": [59.3251, 18.0712]
   },
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c002",
     "name": "Kim Nguyen",
-    "slug": "kim-nguyen",
     "email": "kim.n@gardenmail.com",
-    "password": "GreenThumb2024",
+    "slug": "kim-nguyen",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "user",
     "location": [59.3168, 18.0741]
   },
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c003",
     "name": "Mateo Rossi",
-    "slug": "mateo-rossi",
     "email": "mateo.rossi@provider.se",
-    "password": "CactusLife456",
+    "slug": "mateo-rossi",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "user",
     "location": [59.3210, 18.0585]
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c004",
+    "name": "Linnéa Björk",
+    "email": "linnea.b@vaxtpost.se",
+    "slug": "linnea-bjork",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
+    "role": "user",
+    "location": [59.3412, 18.0210]
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c005",
+    "name": "Erik Sandqvist",
+    "email": "erik.sand@hmail.com",
+    "slug": "erik-sandqvist",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
+    "role": "user",
+    "location": [59.3350, 18.0820]
   }
 ]

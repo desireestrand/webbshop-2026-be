@@ -1,114 +1,162 @@
-import User from "../models/User.js"
-import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/tokens.js"
-import { getUserById } from "./users.js"
+import User from "../models/User.js";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} from "../utils/tokens.js";
+import { getUserById } from "./users.js";
 
-function _generateTokens(user){
-  const payload = { 
-    userId: user._id, 
+function _generateTokens(user) {
+  const payload = {
+    userId: user._id,
     role: user.role,
-    email: user.email 
+    email: user.email,
   };
 
-  const accessToken = generateAccessToken(payload)
-  const refreshToken = generateRefreshToken(payload)
-  return {accessToken, refreshToken}
+  const accessToken = generateAccessToken(payload);
+  const refreshToken = generateRefreshToken(payload);
+  return { accessToken, refreshToken };
 }
 
-function _getUserObject(user){
-/*   const userObject = user.toObject()
+function _getUserObject(user) {
+  /*   const userObject = user.toObject()
   delete userObject.password
   return userObject */
   return user.toJSON();
 }
 
-export async function registerUser(name, email, password, location){
-  const newUser = new User({name, email, password, location})
-  await newUser.save()
-  
-  const {accessToken, refreshToken} = _generateTokens(newUser)
+export async function registerUser(name, email, password, location) {
+  const newUser = new User({ name, email, password, location, role: "user" });
+  await newUser.save();
 
-  const userObject = _getUserObject(newUser)
+  const { accessToken, refreshToken } = _generateTokens(newUser);
 
-  return { user: userObject, accessToken, refreshToken}
+  const userObject = _getUserObject(newUser);
+
+  return { user: userObject, accessToken, refreshToken };
 }
 
-export async function logInUser(email, password){
-    const user = await User.findOne({email: email.toLowerCase()}).select(
-      "+password" //gör så att man ska kunna få password
-    )
-  
-    const response = "Invalid credentials"
-  
-    if(!user){
-      throw new Error(response)
-    }
-  
-    const isSamePassword = await user.isSamePassword(password)
-  
-    if(!isSamePassword){
-      throw new Error(response)
-    }
-  
-    const {accessToken, refreshToken} = _generateTokens(user)
-    const userObject = _getUserObject(user)
+export async function logInUser(email, password) {
+  const user = await User.findOne({ email: email.toLowerCase() }).select(
+    "+password", //gör så att man ska kunna få password
+  );
 
-    return {user: userObject, accessToken, refreshToken}
+  const response = "Invalid credentials";
+
+  if (!user) {
+    throw new Error(response);
+  }
+
+  const isSamePassword = await user.isSamePassword(password);
+
+  if (!isSamePassword) {
+    throw new Error(response);
+  }
+
+  const { accessToken, refreshToken } = _generateTokens(user);
+  const userObject = _getUserObject(user);
+
+  return { user: userObject, accessToken, refreshToken };
 }
 
 export async function refreshAccessToken(refreshToken) {
-  const decodedToken = verifyRefreshToken(refreshToken)
-  const userId = decodedToken?.userId
+  const decodedToken = verifyRefreshToken(refreshToken);
+  const userId = decodedToken?.userId;
 
-  if(!userId){
-    throw new Error("Invalid refresh token")
+  if (!userId) {
+    throw new Error("Invalid refresh token");
   }
 
-  const user = await getUserById(userId)
+  const user = await getUserById(userId);
 
-  if(!user){
-    throw new Error("User not found")
+  if (!user) {
+    throw new Error("User not found");
   }
 
-    const payload = { 
-    userId: user._id, 
+  const payload = {
+    userId: user._id,
     role: user.role,
-    email: user.email 
+    email: user.email,
   };
 
-  const accessToken = generateAccessToken(payload)
-  return{accessToken}
+  const accessToken = generateAccessToken(payload);
+  return { accessToken };
 }
 
-export async function requestPassword(email = ""){
+export async function requestPassword(email = "") {
   await User.findOneAndUpdate(
     {
-      email: email.toLowerCase()
+      email: email.toLowerCase(),
     },
     {
-      resetPasswordCode: `${Math.floor(Math.random() * 100000)}`
-    }
-  )
+      resetPasswordCode: `${Math.floor(Math.random() * 100000)}`,
+    },
+  );
 
   return {
-    message: "If the email exists, a reset code has been sent"
-  }
+    message: "If the email exists, a reset code has been sent",
+  };
 }
 
-export async function confirmPasswordReset( email, code, newPassword){
+export async function confirmPasswordReset(email, code, newPassword) {
   const user = await User.findOne({
     email: email.toLowerCase(),
     resetPasswordCode: code,
-  })
+  });
 
-  if(!user){
-    throw new Error("Unauthorized")
+  if (!user) {
+    throw new Error("Unauthorized");
   }
 
-  user.password = newPassword
-  user.resetPasswordCode = null
-  await user.save()
+  user.password = newPassword;
+  user.resetPasswordCode = null;
+  await user.save();
 
-  return{
-    message: "Password has been reset"
+  return {
+    message: "Password has been reset",
+  };
+}
+
+export async function getAllOfMe(userId) {
+  const historyPopulate = {
+    populate: [
+      {
+        path: "plantId",
+        select: "name image species meetingTime coordinates available",
+      },
+      { path: "ownerId", select: "name email location" },
+      { path: "requesterId", select: "name email location" },
+    ],
+    options: { sort: { createdAt: -1 } },
+  };
+
+  try {
+    const user = await User.findById(userId)
+      .select("name email slug role location createdAt updatedAt")
+      .populate(
+        "plants",
+        "name image species meetingTime coordinates available",
+      )
+      .populate({
+        path: "_activeOwner",
+        ...historyPopulate,
+      })
+      .populate({
+        path: "_activeRequester",
+        ...historyPopulate,
+      })
+      .populate({
+        path: "_completedOwner",
+        ...historyPopulate,
+      })
+      .populate({
+        path: "_completedRequester",
+        ...historyPopulate,
+      });
+
+    return user;
+  } catch (err) {
+    console.error("Unable to find current user", err);
+    return [];
   }
 }

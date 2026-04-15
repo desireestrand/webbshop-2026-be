@@ -19,5 +19,26 @@
     "requesterId": "65f1a2b3c4d5e6f7a8b9c001",
     "ownerId": "65f1a2b3c4d5e6f7a8b9c003",
     "status": "completed"
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c204",
+    "plantId": "65f1a2b3c4d5e6f7a8b9c106",
+    "requesterId": "65f1a2b3c4d5e6f7a8b9c001",
+    "ownerId": "65f1a2b3c4d5e6f7a8b9c004",
+    "status": "pending"
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c205",
+    "plantId": "65f1a2b3c4d5e6f7a8b9c108",
+    "requesterId": "65f1a2b3c4d5e6f7a8b9c004",
+    "ownerId": "65f1a2b3c4d5e6f7a8b9c005",
+    "status": "approved"
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c206",
+    "plantId": "65f1a2b3c4d5e6f7a8b9c110",
+    "requesterId": "65f1a2b3c4d5e6f7a8b9c003",
+    "ownerId": "65f1a2b3c4d5e6f7a8b9c004",
+    "status": "cancelled"
   }
 ]

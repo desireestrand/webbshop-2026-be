@@ -1,4 +1,6 @@
 import User from "../models/User.js";
+import Plant from "../models/Plant.js";
+import Trade from "../models/Trade.js";
 import { getFullTextSearch } from "../utils/fullTextSearch.js";
 
 export async function getUsers(q) {
@@ -98,6 +100,24 @@ export async function deleteUser(id) {
   try {
     const userToDelete = await User.findById(id);
     if (!userToDelete) return null;
+
+    // Delete trades where user is requester and set plant back to available
+    const requesterTrades = await Trade.find({ requesterId: id})
+    for (const trade of requesterTrades) {
+      if (trade.status === "pending" || trade.status === "approved") {
+        await Plant.findByIdAndUpdate(trade.plantId, { available: true })
+      }
+      await Trade.deleteOne({ _id: trade._id })
+    }
+
+    // Delete trades and plants where user is owner 
+    const ownerTrades = await Trade.find({ ownerId: id})
+    for (const trade of ownerTrades) {
+      await Trade.deleteOne({ _id: trade._id })
+    }
+    await Plant.deleteMany({ ownerId: id })
+
+    // Delete User 
     await User.deleteOne({ _id: userToDelete._id });
     return true;
   } catch (err) {
@@ -110,6 +130,26 @@ export async function deleteUserBySlug(slug) {
   try {
     const userToDelete = await User.findOne({ slug: slug });
     if (!userToDelete) return null;
+
+    const id = userToDelete._id
+
+    // Delete trades where user is requester and set plant back to available
+    const requesterTrades = await Trade.find({ requesterId: id })
+    for (const trade of requesterTrades) {
+      if (trade.status === "pending" || trade.status === "approved") {
+        await Plant.findByIdAndUpdate(trade.plantId, { available: true })
+      }
+      await Trade.deleteOne({ _id: trade._id })
+    }
+
+    // Delete trades and plants where user is owner
+    const ownerTrades = await Trade.find({ ownerId: id })
+    for (const trade of ownerTrades) {
+      await Trade.deleteOne({ _id: trade._id })
+    }
+    await Plant.deleteMany({ ownerId: id })
+
+    // Delete user
     await User.deleteOne({ _id: userToDelete._id });
     return true;
   } catch (err) {

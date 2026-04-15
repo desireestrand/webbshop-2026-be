@@ -13,13 +13,12 @@ export const validateTradeResult = (req, res, next) => {
 
 export const validateCreateTrade = [
   body("plantId").isMongoId().withMessage("A valid plantId is required"),
-  body("requesterId").isMongoId().withMessage("A valid requesterId is required"),
   validateTradeResult
 ];
 
 export const validateUpdateTradeStatus = [
   param("id").isMongoId().withMessage("Invalid trade ID"),
-  body("status").notEmpty().isIn(STATUS_LEVEL).withMessage("Status must be one of: pending, accepted, rejected, completed"),
+  body("status").notEmpty().isIn(STATUS_LEVEL).withMessage("Status must be one of: pending, approved, cancelled, completed"),
   validateTradeResult
 ];
 
