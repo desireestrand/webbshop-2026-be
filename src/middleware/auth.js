@@ -11,7 +11,7 @@ export function requireAuth(req, res, next){
 
     const decodedToken = verifyAccessToken(token)
     req.userId = decodedToken.userId
-    req.userRole = decodedToken.userRole
+    req.userRole = decodedToken.role
 
   }catch(error){
     if(error?.message?.includes("expired")){
