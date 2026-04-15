@@ -17,7 +17,7 @@ import { requireAdmin, requireAuth } from "../middleware/auth.js"
 const tradeRouter = Router()
 
 // GET /trades
-tradeRouter.get("/", requireAuth, requireAdmin, async (req, res) => {
+tradeRouter.get("/", /* requireAuth, requireAdmin, */ async (req, res) => {
   // TODO Validation for Admin
   const trades = await getAllTrades()
 
@@ -38,7 +38,7 @@ tradeRouter.get("/mine", requireAuth, async (req, res) => {
 })
 
 // GET /trades/:id
-tradeRouter.get("/:id", requireAuth, requireAdmin, validateIdParam, async (req, res) => {
+tradeRouter.get("/:id", /* requireAuth, requireAdmin, */ validateIdParam, async (req, res) => {
   // TODO Validation for Admin
 
   const id = req.params.id
@@ -54,7 +54,7 @@ tradeRouter.get("/:id", requireAuth, requireAdmin, validateIdParam, async (req, 
 })
 
 // POST /trades
-tradeRouter.post("/", requireAuth, validateCreateTrade, async (req, res) => {
+tradeRouter.post("/", /* requireAuth, */ validateCreateTrade, async (req, res) => {
   // TODO Validation for User (ownerId !== requesterId) and Admin
   const requesterId = req.userId
   const { plantId } = req.body;
@@ -65,7 +65,7 @@ tradeRouter.post("/", requireAuth, validateCreateTrade, async (req, res) => {
 })
 
 // TODO PATCH /trades/:id/status
-tradeRouter.patch("/:id/status", requireAuth, validateUpdateTradeStatus, async (req, res) => {
+tradeRouter.patch("/:id/status", /* requireAuth, */ validateUpdateTradeStatus, async (req, res) => {
   // TODO Validation for User (owner) and Admin
   try {
     const id = req.params.id;
@@ -102,7 +102,7 @@ tradeRouter.patch("/:id/status", requireAuth, validateUpdateTradeStatus, async (
 })
 
 // DELETE /trades/:id
-tradeRouter.delete("/:id", requireAuth, validateIdParam, async (req, res) => {
+tradeRouter.delete("/:id", /* requireAuth, */ validateIdParam, async (req, res) => {
   // TODO Validation for User (requester) and Admin
 
   const id = req.params.id

@@ -13,7 +13,7 @@ import { requireAuth, requireAdmin } from "../middleware/auth.js";
 
 const userRouter = Router()
 
-userRouter.get("/", requireAuth, requireAdmin, async (req, res) => {
+userRouter.get("/", /* requireAuth, requireAdmin, */ async (req, res) => {
   const { q } = req.query
 
   const users = await getUsers(q)
@@ -22,7 +22,7 @@ userRouter.get("/", requireAuth, requireAdmin, async (req, res) => {
 })
 
 // GET /users/id/:id
-userRouter.get("/id/:id", requireAuth, requireAdmin, async (req, res) => {
+userRouter.get("/id/:id", /* requireAuth, requireAdmin, */ async (req, res) => {
   const user = await getUserById(req.params.id)
 
   if (!user) {
@@ -33,7 +33,7 @@ userRouter.get("/id/:id", requireAuth, requireAdmin, async (req, res) => {
 })
 
 // GET /users/:slug
-userRouter.get("/:slug", requireAuth, async (req, res) => {
+userRouter.get("/:slug", /* requireAuth, */ async (req, res) => {
   const user = await getUserBySlug(req.params.slug)
 
   if (!user) {
@@ -46,13 +46,13 @@ userRouter.get("/:slug", requireAuth, async (req, res) => {
 })
 
 // POST /users
-userRouter.post("/", requireAuth, async (req, res) => {
+userRouter.post("/", /* requireAuth, */ async (req, res) => {
   const user = await createUser(req.body)
   res.status(201).json(user)
 })
 
 // PUT /users/id/:id
-userRouter.put("/id/:id", requireAuth, requireAdmin, async (req, res) => {
+userRouter.put("/id/:id", /* requireAuth, requireAdmin, */ async (req, res) => {
   const user = await updateUser(req.params.id, req.body)
 
   if (!user) {
@@ -63,7 +63,7 @@ userRouter.put("/id/:id", requireAuth, requireAdmin, async (req, res) => {
 })
 
 // PUT /users/:slug
-userRouter.put("/:slug", requireAuth, validateUpdateUser, async (req, res) => {
+userRouter.put("/:slug", /* requireAuth, */ validateUpdateUser, async (req, res) => {
   const slug = req.params.slug
   const { name, email, location } = req.body
 
@@ -81,7 +81,7 @@ userRouter.put("/:slug", requireAuth, validateUpdateUser, async (req, res) => {
 //PATCH /users/id/:id
 userRouter.patch(
   "/id/:id",
-  requireAuth, requireAdmin,
+  /* requireAuth, requireAdmin, */
   validateUpdateUser,
   async (req, res) => {
     const user = await updateUser(req.params.id, req.body)
@@ -97,7 +97,7 @@ userRouter.patch(
 //PATCH /users/:slug
 userRouter.patch(
   "/:slug",
-  requireAuth,
+  /* requireAuth, */
   validateUpdateUser,
   async (req, res) => {
     const slug = req.params.slug
@@ -116,7 +116,7 @@ userRouter.patch(
 )
 
 // DELETE /users/id/:id
-userRouter.delete("/id/:id", requireAuth, requireAdmin, async (req, res) => {
+userRouter.delete("/id/:id", /* requireAuth, requireAdmin, */ async (req, res) => {
   const user = await deleteUser(req.params.id)
 
   if (!user) {
@@ -127,7 +127,7 @@ userRouter.delete("/id/:id", requireAuth, requireAdmin, async (req, res) => {
 })
 
 // DELETE /users/:slug
-userRouter.delete("/:slug", requireAuth, async (req, res) => {
+userRouter.delete("/:slug", /* requireAuth, */ async (req, res) => {
   const slug = req.params.slug
   const user = await deleteUserBySlug(slug)
   if (!user) {

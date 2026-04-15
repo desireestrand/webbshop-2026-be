@@ -27,7 +27,7 @@ plantRouter.get("/", async (req, res) => {
 })
 
 // GET /plants/all with search
-plantRouter.get("/all", requireAuth, requireAdmin, async (req, res) => {
+plantRouter.get("/all", /* requireAuth, requireAdmin, */ async (req, res) => {
   const { q } = req.query;
   
   const plants = await getAllPlants(q)
@@ -49,7 +49,7 @@ plantRouter.get("/mine", requireAuth, async (req, res) => {
 })
 
 // GET /plants/:slug
-plantRouter.get("/:slug", requireAuth, async (req, res) => {
+plantRouter.get("/:slug", /* requireAuth, */ async (req, res) => {
   const slug = req.params.slug;
 
   const plant = await getPlantBySlug(slug)
@@ -64,7 +64,7 @@ plantRouter.get("/:slug", requireAuth, async (req, res) => {
 })
 
 // POST /plants
-plantRouter.post("/", requireAuth, validatePlant, validatePlantResult, async (req, res) => {
+plantRouter.post("/", /* requireAuth, */ validatePlant, validatePlantResult, async (req, res) => {
   const plantData = {
     ...req.body,
     ownerId: req.userId 
@@ -76,7 +76,7 @@ plantRouter.post("/", requireAuth, validatePlant, validatePlantResult, async (re
 })
 
 // PUT /plants/:slug
-plantRouter.put("/:slug", requireAuth, validatePlant, validatePlantResult,
+plantRouter.put("/:slug", /* requireAuth, */ validatePlant, validatePlantResult,
   async (req, res) => {
   // TODO Validation for Admin
   const slug = req.params.slug;
@@ -114,7 +114,7 @@ plantRouter.put("/:slug", requireAuth, validatePlant, validatePlantResult,
 )
 
 // PATCH /plants/:slug
-plantRouter.patch("/:slug", requireAuth, validatePlantUpdate, validatePlantResult, async (req, res) => {
+plantRouter.patch("/:slug", /* requireAuth, */ validatePlantUpdate, validatePlantResult, async (req, res) => {
   // TODO Validation for User (owner) and Admin
   const slug = req.params.slug
 
@@ -144,7 +144,7 @@ plantRouter.patch("/:slug", requireAuth, validatePlantUpdate, validatePlantResul
 )
 
 // DELETE /plants/:slug
-plantRouter.delete("/:slug", requireAuth, async (req, res) => {
+plantRouter.delete("/:slug", /* requireAuth, */ async (req, res) => {
   // TODO Validation for User (owner) and Admin
 
   const slug = req.params.slug
