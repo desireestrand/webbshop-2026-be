@@ -33,7 +33,11 @@ export async function getTradeById(id) {
 
 export async function getTradesByOwnerId(ownerId) {
   try {
-    return await Trade.find({ ownerId: ownerId })
+    return await Trade.find({   
+      $or: [
+        { ownerId: ownerId },
+        { requesterId: ownerId }
+      ]})
       .populate("ownerId", "name")
       .populate("requesterId", "name")
       .populate(
