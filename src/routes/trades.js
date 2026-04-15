@@ -56,20 +56,23 @@ tradeRouter.get("/:id", /* requireAuth, requireAdmin, */ validateIdParam, async 
 // POST /trades
 tradeRouter.post("/", /* requireAuth, */ validateCreateTrade, async (req, res) => {
   // TODO Validation for User (ownerId !== requesterId) and Admin
-  const requesterId = req.userId
-  const { plantId } = req.body;
-
-  const trade = await createTrade({ plantId, requesterId })
-
-  res.status(201).json(trade)
+ /* const requesterId = req.userId */
+ // Remove requesterId when add requireAuth
+  const { plantId, requesterId } = req.body;
+  try{
+    const trade = await createTrade({ plantId,  requesterId })
+    res.status(201).json(trade)
+  } catch (err) {
+    return res.status(409).json({ message: err.message })
+  }
 })
 
 // TODO PATCH /trades/:id/status
 tradeRouter.patch("/:id/status", /* requireAuth, */ validateUpdateTradeStatus, async (req, res) => {
   // TODO Validation for User (owner) and Admin
   try {
-    const id = req.params.id;
-    const status = req.body.status;
+    /* const id = req.params.id;
+    const status = req.body.status; */
     
     const trade = await getTradeById(id)
     

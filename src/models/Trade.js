@@ -54,6 +54,19 @@ tradeSchema.pre("validate", async function (next) {
     this.ownerId = plant.ownerId;
   }
 
+  if (this.isNew) {
+    const existingTrade = await this.constructor.findOne({
+      plantId: this.plantId,
+      requesterId: this.requesterId,
+      status: { $ne: STATUS_LEVEL.cancelled }
+    });
+
+    if (existingTrade) {
+      const error = new Error("You have already sent a trade request for this plant");
+      return next(error);
+    }
+  }
+
   if (this.requesterId?.equals(this.ownerId)) {
     const error = new Error("Requester and owner cannot be the same user");
     return next(error);

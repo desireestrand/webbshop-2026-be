@@ -58,6 +58,7 @@ export async function createTrade(tradeData) {
     return await Trade.populate(newTrade, "plantId requesterId ownerId")
   } catch (err) {
     console.error("Unable to create 'Trade'", err)
+    throw err;
   }
 }
 
