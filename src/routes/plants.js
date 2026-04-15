@@ -36,7 +36,7 @@ plantRouter.get("/all", requireAuth, requireAdmin, async (req, res) => {
 })
 
 // GET /plants/mine
-plantRouter.get("/mine", async (req, res) => {
+plantRouter.get("/mine", requireAuth, async (req, res) => {
   const myPlants = await getPlantsByOwnerId(req.userId)
 
   if (!myPlants) {

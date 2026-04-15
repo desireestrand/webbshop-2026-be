@@ -52,7 +52,7 @@ userRouter.post("/", requireAuth, async (req, res) => {
 })
 
 // PUT /users/id/:id
-userRouter.put("/id/:id", requireAuth, async (req, res) => {
+userRouter.put("/id/:id", requireAuth, requireAdmin, async (req, res) => {
   const user = await updateUser(req.params.id, req.body)
 
   if (!user) {
@@ -81,7 +81,7 @@ userRouter.put("/:slug", requireAuth, validateUpdateUser, async (req, res) => {
 //PATCH /users/id/:id
 userRouter.patch(
   "/id/:id",
-  requireAuth,
+  requireAuth, requireAdmin,
   validateUpdateUser,
   async (req, res) => {
     const user = await updateUser(req.params.id, req.body)
@@ -116,7 +116,7 @@ userRouter.patch(
 )
 
 // DELETE /users/id/:id
-userRouter.delete("/id/:id", async (req, res) => {
+userRouter.delete("/id/:id", requireAuth, requireAdmin, async (req, res) => {
   const user = await deleteUser(req.params.id)
 
   if (!user) {
@@ -127,7 +127,7 @@ userRouter.delete("/id/:id", async (req, res) => {
 })
 
 // DELETE /users/:slug
-userRouter.delete("/:slug", async (req, res) => {
+userRouter.delete("/:slug", requireAuth, async (req, res) => {
   const slug = req.params.slug
   const user = await deleteUserBySlug(slug)
   if (!user) {

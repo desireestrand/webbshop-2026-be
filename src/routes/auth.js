@@ -20,23 +20,30 @@ import {
 } from "../db/auth.js"
 import { verifyRefreshToken } from "../utils/tokens.js"
 import { validateUpdateUser } from "../middleware/userValidation.js"
+import { requireAdmin, requireAuth } from "../middleware/auth.js"
 
 const authRouter = Router()
 
-//GET Me
-authRouter.get("/me", async (req, res) => {
-  const { q } = req.query
+// GET /auth/me
+authRouter.get("/me", requireAuth, async (req, res) => {
+  try {
+    const user = await getAllOfMe(req.userId);
 
-  const users = await getAllOfMe(q)
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
 
-  res.json(users)
+    res.json(user)
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching profile" });
+  }
 })
 
-// PATCH/auth/me
-authRouter.patch("/me", /*requireAuth,*/ validateUpdateUser, async (req,res) => {
+// PATCH /auth/me
+authRouter.patch("/me", requireAuth, validateUpdateUser, async (req,res) => {
   try {
     // Get the logged in user's ID from the auth middleware (added when requireAuth is implemented)
-    const userId = req.user._id 
+    const userId = req.userId
 
     const { name, email, location } = req.body
 
@@ -54,13 +61,11 @@ authRouter.patch("/me", /*requireAuth,*/ validateUpdateUser, async (req,res) => 
   }
 })
 
-
-
-// DELETE / auth / me
-authRouter.delete("/me", /*requireAuth,*/ async (req, res) => {
+// DELETE /auth/me
+authRouter.delete("/me", requireAuth, async (req, res) => {
 try {
   // Get the logged in user's ID from the auth middleware
-  const userId = req.user._id 
+  const userId = req.userId
 
   const deleted = await deleteUser(userId)
 

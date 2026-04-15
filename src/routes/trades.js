@@ -24,6 +24,19 @@ tradeRouter.get("/", requireAuth, requireAdmin, async (req, res) => {
   res.json(trades)
 })
 
+// GET /trades/mine
+tradeRouter.get("/mine", requireAuth, async (req, res) => {
+  const myTrades = await getTradesByOwnerId(req.userId)
+
+  if (!myTrades) {
+    return res.status(404).json({
+      message: "Your trades not found",
+    })
+  }
+
+  res.json(myTrades)
+})
+
 // GET /trades/:id
 tradeRouter.get("/:id", requireAuth, requireAdmin, validateIdParam, async (req, res) => {
   // TODO Validation for Admin
@@ -38,20 +51,6 @@ tradeRouter.get("/:id", requireAuth, requireAdmin, validateIdParam, async (req, 
   }
 
   res.json(trade)
-})
-
-// GET /trades/mine
-// TODO Validation for User and Admin
-tradeRouter.get("/mine", requireAuth, requireAdmin, async (req, res) => {
-  const myTrades = await getTradesByOwnerId(req.userId)
-
-  if (!myTrades) {
-    return res.status(404).json({
-      message: "Your trades not found",
-    })
-  }
-
-  res.json(myTrades)
 })
 
 // POST /trades
