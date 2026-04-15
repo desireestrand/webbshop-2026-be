@@ -94,7 +94,7 @@ userRouter.patch(
   },
 )
 
-//PATCH /users/:slug
+// PATCH /users/:slug
 userRouter.patch(
   "/:slug",
   /* requireAuth, */
