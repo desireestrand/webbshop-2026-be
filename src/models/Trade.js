@@ -47,9 +47,11 @@ tradeSchema.pre("validate", async function (next) {
   if (this.isNew || this.isModified("plantId")) {
     const plant = await Plant.findById(this.plantId).select("ownerId");
 
-    if (plant) {
-      this.ownerId = plant.ownerId;
+    if (!plant) {
+      const error = new Error("Plant not found");
+      return next(error);
     }
+    this.ownerId = plant.ownerId;
   }
 
   if (this.requesterId?.equals(this.ownerId)) {
