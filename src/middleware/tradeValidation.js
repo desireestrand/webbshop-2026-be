@@ -18,7 +18,7 @@ export const validateCreateTrade = [
 
 export const validateUpdateTradeStatus = [
   param("id").isMongoId().withMessage("Invalid trade ID"),
-  body("status").notEmpty().isIn(STATUS_LEVEL).withMessage("Status must be one of: pending, accepted, rejected, completed"),
+  body("status").notEmpty().isIn(STATUS_LEVEL).withMessage("Status must be one of: pending, approved, cancelled, completed"),
   validateTradeResult
 ];
 
