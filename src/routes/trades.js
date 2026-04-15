@@ -80,7 +80,7 @@ tradeRouter.patch("/:id/status", requireAuth, validateUpdateTradeStatus, async (
     }
     
     // Kontrollera att användaren är en del av trade
-    if (trade.ownerId._id.toString() !== req.userId && trade.requesterId._id.toString() !== req.userId ) {
+    if (trade.ownerId._id.toString() !== req.userId && trade.requesterId._id.toString() !== req.userId && req.userRole !== "admin") {
       return res.status(403).json({ message: "Not allowed to update trade" })
     }
     
