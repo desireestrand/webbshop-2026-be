@@ -80,7 +80,8 @@ plantRouter.post(
       ownerId: req.userId,
     };
 
-    const plant = await createPlant(plantData);
+    // change to plantData instead of req.body later
+    const plant = await createPlant(req.body);
 
     res.status(201).json(plant);
   },
