@@ -7,13 +7,12 @@ const placeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    library: {
+    placeName: {
       type: String,
       required: true,
     },
     coordinates: {
       type: [Number],
-      // default: [0, 0],
       required: true,
     },
   },

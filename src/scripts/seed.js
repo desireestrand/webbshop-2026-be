@@ -71,7 +71,7 @@ async function seedPlaces() {
   const toInsert = placesFromFile.map((t) => ({
     _id: t._id,
     city: t.city,
-    library: t.library,
+    placeName: t.placeName,
     coordinates: t.coordinates,
   })) //slug: u.slug
   await Place.insertMany(toInsert)

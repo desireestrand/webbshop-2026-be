@@ -2,31 +2,31 @@
     {
         "_id": "661ff1a0c1a4b2d3e4f50101",
         "city": "Stockholm",
-        "library": "Stockholm Public Library (Asplundhuset)",
+        "placeName": "Stockholm Public placeName (Asplundhuset)",
         "coordinates": [59.3434, 18.0543]
     },
     {
         "_id": "661ff1a0c1a4b2d3e4f50102",
         "city": "Stockholm",
-        "library": "National Library of Sweden (Kungliga bibl.)",
+        "placeName": "National placeName of Sweden (Kungliga bibl.)",
         "coordinates": [59.3384, 18.0722]
     },
     {
         "_id": "661ff1a0c1a4b2d3e4f50103",
         "city": "Uppsala",
-        "library": "Uppsala Public Library",
+        "placeName": "Uppsala Public placeName",
         "coordinates": [59.8604, 17.6366]
     },
     {
         "_id": "661ff1a0c1a4b2d3e4f50104",
         "city": "Uppsala",
-        "library": "Carolina Rediviva (Uppsala University)",
+        "placeName": "Carolina Rediviva (Uppsala University)",
         "coordinates": [59.8549, 17.6311]
     },
     {
         "_id": "661ff1a0c1a4b2d3e4f50105",
         "city": "Västerås",
-        "library": "Västerås City Library",
+        "placeName": "Västerås City placeName",
         "coordinates": [59.6119, 16.5448]
     }
 ]
