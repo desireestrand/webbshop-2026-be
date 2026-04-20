@@ -143,20 +143,32 @@ userRouter.patch("/id/:id", requireAuth, /*requireAdmin*/ validateUpdateUser, as
 
 // PATCH /users/:slug
 userRouter.patch("/:slug", requireAuth, validateUpdateUser, async (req, res) => {
-    const slug = req.params.slug
-    const { email, name, location } = req.body
+  const slug = req.params.slug
 
-    const updatedUser = await updateUserBySlug(slug, { email, name, location })
-
-    if (!updatedUser) {
+  const user = await getUserBySlug(slug)
+  if(!user){
       return res.status(404).json({
-        message: "User does not exist",
+        message: "User not found",
       })
-    }
+  }
+  if (user._id.toString() !== req.userId ) {
+    return res
+      .status(403)
+      .json({ message: "Not allowed to update this user" });
+  }
 
-    return res.status(200).json(updatedUser)
-  },
-)
+  const { name, email, location } = req.body
+
+  const updatedUser = await updateUserBySlug(slug, { name, email, location })
+
+  if (!updatedUser) {
+    return res.status(404).json({
+      message: "User not found",
+    })
+  }
+
+  return res.status(200).json(updatedUser)
+})
 
 // DELETE /users/id/:id
 userRouter.delete("/id/:id", requireAuth, /*requireAdmin*/ async (req, res) => {
