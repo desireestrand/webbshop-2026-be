@@ -172,15 +172,29 @@ userRouter.patch("/:slug", requireAuth, validateUpdateUser, async (req, res) => 
 
 // DELETE /users/id/:id
 userRouter.delete("/id/:id", requireAuth, /*requireAdmin*/ async (req, res) => {
-  const user = await deleteUser(req.params.id)
+  const id = req.params.id
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" })
-    }
+  const user = await getUserById(id)
 
-    res.status(204).json()
-  },
-)
+  if(!user){
+    return res.status(404).json({
+      message: "User not found",
+    })
+  }
+  if (user._id.toString() !== req.userId ) {
+    return res
+      .status(403)
+      .json({ message: "Not allowed to delete this user" });
+  }
+
+  const deletedUser = await deleteUser(id)
+
+  if (!deletedUser) {
+    return res.status(404).json({ message: "User not found" })
+  }
+
+  res.status(204).json()
+})
 
 // DELETE /users/:slug
 userRouter.delete("/:slug", requireAuth, async (req, res) => {
