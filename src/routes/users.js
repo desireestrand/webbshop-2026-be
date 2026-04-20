@@ -144,7 +144,6 @@ userRouter.patch("/id/:id", requireAuth, /*requireAdmin*/ validateUpdateUser, as
 // PATCH /users/:slug
 userRouter.patch("/:slug", requireAuth, validateUpdateUser, async (req, res) => {
   const slug = req.params.slug
-
   const user = await getUserBySlug(slug)
   if(!user){
       return res.status(404).json({
@@ -199,8 +198,21 @@ userRouter.delete("/id/:id", requireAuth, /*requireAdmin*/ async (req, res) => {
 // DELETE /users/:slug
 userRouter.delete("/:slug", requireAuth, async (req, res) => {
   const slug = req.params.slug
-  const user = await deleteUserBySlug(slug)
-  if (!user) {
+
+  const user = await getUserBySlug(slug)
+  if(!user){
+      return res.status(404).json({
+        message: "User not found",
+      })
+  }
+  if (user._id.toString() !== req.userId ) {
+    return res
+      .status(403)
+      .json({ message: "Not allowed to delete this user" });
+  }
+
+  const deletedUser = await deleteUserBySlug(slug)
+  if (!deletedUser) {
     return res.status(400).json({
       message: "User does not exist",
     })
