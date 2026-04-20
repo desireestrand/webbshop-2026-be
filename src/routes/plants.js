@@ -166,7 +166,7 @@ plantRouter.patch("/:slug", requireAuth, validatePlantUpdate, validatePlantResul
 
     return res.status(200).json(updatedPlant);
   } catch (error) {
-    return res.status(500).json({ message: "Error updating plant" });
+    return res.status(500).json({ message: "Error while updating plant" });
   }
 });
 
@@ -194,7 +194,7 @@ plantRouter.delete("/:slug", requireAuth, async (req, res) => {
 
     return res.status(204).json();
   } catch (error) {
-    return res.status(500).json({ message: "Error deleting plant" });
+    return res.status(500).json({ message: "Error while deleting plant" });
   }
 });
 
