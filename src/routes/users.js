@@ -61,14 +61,27 @@ userRouter.post("/", requireAuth, async (req, res) => {
 })
 
 // PUT /users/id/:id
-userRouter.put("/id/:id", requireAuth, /*requireAdmin*/ async (req, res) => {
-  const user = await updateUser(req.params.id, req.body)
+userRouter.put("/id/:id", requireAuth, /*requireAdmin*/ validateUpdateUser, async (req, res) => {
+  const id = req.params.id
 
-    if (!user) {
+  const user = await getUserById(id)
+  if(!user){
+      return res.status(404).json({
+        message: "User not found",
+      })
+  }
+  if (user._id.toString() !== req.userId ) {
+    return res
+      .status(403)
+      .json({ message: "Not allowed to update this user" });
+  }
+  const updatedUser = await updateUser(id, req.body)
+
+    if (!updatedUser) {
       return res.status(404).json({ message: "User not found" })
     }
 
-    res.status(200).json(user)
+    res.status(200).json(updatedUser)
   },
 )
 
