@@ -75,6 +75,19 @@ userRouter.put("/id/:id", requireAuth, /*requireAdmin*/ async (req, res) => {
 // PUT /users/:slug
 userRouter.put("/:slug", requireAuth, validateUpdateUser, async (req, res) => {
   const slug = req.params.slug
+
+  const user = await getUserBySlug(slug)
+  if(!user){
+      return res.status(404).json({
+        message: "User not found",
+      })
+  }
+  if (user._id.toString() !== req.userId ) {
+    return res
+      .status(403)
+      .json({ message: "Not allowed to update this user" });
+  }
+
   const { name, email, location } = req.body
 
     const updatedUser = await updateUserBySlug(slug, { name, email, location })
