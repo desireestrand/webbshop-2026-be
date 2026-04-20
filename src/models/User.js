@@ -53,18 +53,18 @@ const userSchema = new mongoose.Schema(
         delete ret.__v;
         delete ret.id;
 
+        if (!ret.activeTrades || ret.activeTrades.length === 0) {
+          delete ret.activeTrades;
+        }
+
+        if (!ret.history || ret.history.length === 0) {
+          delete ret.history;
+        }
+
         delete ret._activeOwner;
         delete ret._activeRequester;
         delete ret._completedOwner;
         delete ret._completedRequester;
-
-        if (!doc.populated("_activeOwner") && !doc.populated("_activeRequester")) {
-          delete ret.activeTrades;
-        }
-
-        if (!doc.populated("_completedOwner") && !doc.populated("_completedRequester")) {
-          delete ret.history;
-        }
 
         return ret;
       },
@@ -77,19 +77,19 @@ const userSchema = new mongoose.Schema(
         delete ret.__v;
         delete ret.id;
 
+        if (!ret.activeTrades || ret.activeTrades.length === 0) {
+          delete ret.activeTrades;
+        }
+
+        if (!ret.history || ret.history.length === 0) {
+          delete ret.history;
+        }
+
         delete ret._activeOwner;
         delete ret._activeRequester;
         delete ret._completedOwner;
         delete ret._completedRequester;
 
-        if (!doc.populated("_activeOwner") && !doc.populated("_activeRequester")) {
-          delete ret.activeTrades;
-        }
-
-        if (!doc.populated("_completedOwner") && !doc.populated("_completedRequester")) {
-          delete ret.history;
-        }
-        
         return ret;
       },
     },

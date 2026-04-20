@@ -20,27 +20,25 @@ import { requireAdmin, requireAuth } from "../middleware/auth.js"
 
 const authRouter = Router()
 
-// GET /auth/me
+// GET /auth/me - Current user
 authRouter.get("/me", requireAuth, async (req, res) => {
   try {
     const user = await getAllOfMe(req.userId)
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" })
+      return res.status(404).json({ message: "Profile not found" })
     }
 
-    res.json(user)
+    return res.json(user)
   } catch (error) {
-    res.status(500).json({ message: "Error fetching profile" })
+    res.status(500).json({ message: "Error while fetching your profile" })
   }
 })
 
-// PATCH /auth/me
+// PATCH /auth/me - Current user
 authRouter.patch("/me", requireAuth, validateUpdateUser, async (req, res) => {
   try {
-    // Get the logged in user's ID from the auth middleware (added when requireAuth is implemented)
     const userId = req.userId
-
     const { name, email, location } = req.body
 
     const updatedUser = await updateUser(userId, { name, email, location })
@@ -52,17 +50,15 @@ authRouter.patch("/me", requireAuth, validateUpdateUser, async (req, res) => {
     }
 
     return res.status(200).json(updatedUser)
-  } catch (err) {
-    return res.status(401).json({ message: "Unauthorized" })
+  } catch (error) {
+    res.status(500).json({ message: "Could not update profile" });
   }
 })
 
-// DELETE /auth/me
+// DELETE /auth/me - Current user
 authRouter.delete("/me", requireAuth, async (req, res) => {
   try {
-    // Get the logged in user's ID from the auth middleware
     const userId = req.userId
-
     const deleted = await deleteUser(userId)
 
     if (!deleted) {
@@ -70,15 +66,16 @@ authRouter.delete("/me", requireAuth, async (req, res) => {
         message: "User not found",
       })
     }
-    return res.status(204).json()
-  } catch (err) {
-    return res.status(401).json({ message: "Unauthorized" })
+
+    return res.status(204).json();
+  } catch (error) {
+    res.status(500).json({ message: "Error while deleting account" });
   }
 })
 
 // POST /auth/register
 authRouter.post(
-  "/register",
+"/register",
   validateRegister,
   validateAuthResult,
   async (req, res) => {
@@ -88,7 +85,7 @@ authRouter.post(
       const existingUser = await findUserByEmail(email)
 
       if (existingUser) {
-        return res.status(409).json({ error: "Email already registered" })
+        return res.status(409).json({ error: "Email already in use" })
       }
 
       // Sending name, email, password and location to registerUser function and getting back user, accessToken and refreshToken
@@ -98,12 +95,10 @@ authRouter.post(
         password,
         location,
       )
+
       return res.status(201).json({ accessToken, refreshToken })
     } catch (error) {
-      console.log("Failed to register user", error)
-      return res
-        .status(400)
-        .json({ message: "User was not registered", error: error.message })
+      res.status(500).json({ message: "Registration failed", error: error.message })
     }
   },
 )

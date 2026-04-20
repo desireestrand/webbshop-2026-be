@@ -1,34 +1,33 @@
 import { verifyAccessToken } from "../utils/tokens.js";
 
-export function requireAuth(req, res, next){
-  try{
-    const header = req.headers?.authorization
-    const token = header?.split(" ")?.[1]
+export function requireAuth(req, res, next) {
+  try {
+    const header = req.headers?.authorization;
+    const token = header?.split(" ")?.[1];
 
-    if(!token){
-      throw new Error("Unauthorized")
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized: Access token missing" });
     }
 
-    const decodedToken = verifyAccessToken(token)
-    req.userId = decodedToken.userId
-    req.userRole = decodedToken.role
-
-  }catch(error){
-    if(error?.message?.includes("expired")){
+    const decodedToken = verifyAccessToken(token);
+    req.userId = decodedToken.userId;
+    req.userRole = decodedToken.role;
+  } catch (error) {
+    if (error?.message?.includes("expired")) {
       return res.status(401).json({
-        message: "Unauthorized - Expired"
-      })
+        message: "Unauthorized: Expired",
+      });
     }
     return res.status(401).json({
-      message: "Unauthorized"
-    })
+      message: "Unauthorized: Invalid token",
+    });
   }
-  next()
+  next();
 }
 
 export function requireAdmin(req, res, next) {
   if (req?.userRole !== "admin") {
-    return res.status(403).json({ message: "Forbidden" })
+    return res.status(403).json({ message: "Forbidden: Admin access required" });
   }
 
   next();
