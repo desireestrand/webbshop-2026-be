@@ -24,7 +24,7 @@
     "slug": "mateo-rossi",
     "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "user",
-    "location": [59.3210, 18.0585]
+    "location": [59.321, 18.0585]
   },
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c004",
@@ -33,7 +33,7 @@
     "slug": "linnea-bjork",
     "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "user",
-    "location": [59.3412, 18.0210]
+    "location": [59.3412, 18.021]
   },
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c005",
@@ -42,6 +42,6 @@
     "slug": "erik-sandqvist",
     "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "user",
-    "location": [59.3350, 18.0820]
+    "location": [59.335, 18.082]
   }
 ]

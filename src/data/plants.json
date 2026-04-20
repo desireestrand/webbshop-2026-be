@@ -2,7 +2,7 @@
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c101",
     "name": "Stickling av Gullranka",
-    "image": "https://olnispasidan.se/wp-content/uploads/2025/12/image48.webp",
+    "image": "https://img.tradera.net/large-fit/787/602960787_98ae5fbf-1339-4a1c-abad-e7903cc93399.jpg",
     "slug": "stickling-av-gullranka",
     "species": "Epipremnum aureum",
     "lightLevels": "bright",
@@ -26,7 +26,7 @@
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c103",
     "name": "Värmeälskande Ormbunke",
-    "image": "https://images.unsplash.com/photo-1633638935386-2f11a8e39044?w=900&auto=format&fit=crop&q=60",
+    "image": "https://www.wexthuset.com/content/vaxter/krukvaxter/spjutbraken-skotsel-och-forokning/foroka-spjutbraken-med-revor-LL.jpg",
     "slug": "varmealskande-ormbunke",
     "species": "Nephrolepis exaltata",
     "lightLevels": "partial",
@@ -38,19 +38,19 @@
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c104",
     "name": "Stor Fiolfikus",
-    "image": "https://images.unsplash.com/photo-1653127181429-563bc572a83a?w=900&auto=format&fit=crop&q=60",
+    "image": "https://blogg.land.se/trahopsochkarlek/wp-content/uploads/sites/21/2020/02/Fiolfikus06.jpg",
     "slug": "stor-fiolfikus",
     "species": "Ficus lyrata",
     "lightLevels": "bright",
     "ownerId": "65f1a2b3c4d5e6f7a8b9c001",
     "coordinates": [59.3290, 18.0690],
     "meetingTime": "2026-04-22T11:00:00.000Z",
-    "available": false
+    "available": true
   },
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c105",
     "name": "Ökenros (Adenium)",
-    "image": "https://images.unsplash.com/photo-1718473476820-23698e777b7a?w=900&auto=format&fit=crop&q=60",
+    "image": "https://www.apieceofnature.eu/cdn/shop/files/Adeniumobesum_2.jpg?v=1772800049&width=1445",
     "slug": "okenros-adenium",
     "species": "Adenium obesum",
     "lightLevels": "direct sun",
@@ -62,7 +62,7 @@
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c106",
     "name": "Mönsterblad (Calathea)",
-    "image": "https://www.blomsterlandet.se/contentassets/9277ed5dd2b9490490f0b4133c0acc3d/20240429_bl_gronavaxter_361.jpg",
+    "image": "https://media.blomsterfamiljen.se/2020/10/Calathea-makoyana-1.jpg",
     "slug": "monsterblad-calathea",
     "species": "Calathea makoyana",
     "lightLevels": "partial",
@@ -74,7 +74,7 @@
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c107",
     "name": "Svärmorstunga",
-    "image": "https://images.unsplash.com/photo-1593482892290-f54927ae1bb6?w=900&auto=format&fit=crop&q=60",
+    "image": "https://giftinformation.se/globalassets/bilder-vaxter/svarmors-tunga-1.jpg",
     "slug": "svarmorstunga",
     "species": "Sansevieria trifasciata",
     "lightLevels": "low",
@@ -86,19 +86,19 @@
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c108",
     "name": "Aloe Vera Vera",
-    "image": "https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?w=900&auto=format&fit=crop&q=60",
+    "image": "https://rootedinparadisess.com/cdn/shop/products/20221204_150239.jpg?v=1670199758",
     "slug": "aloe-vera",
     "species": "Aloe barbadensis miller",
     "lightLevels": "direct sun",
     "ownerId": "65f1a2b3c4d5e6f7a8b9c005",
     "coordinates": [59.3380, 18.0720],
     "meetingTime": "2026-05-15T12:00:00.000Z",
-    "available": true
+    "available": false
   },
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c109",
     "name": "Monstera Deliciosa",
-    "image": "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=900&auto=format&fit=crop&q=60",
+    "image": "https://media.blomsterfamiljen.se/2019/10/Monstera-deliciosa-vuxen-planta.jpg",
     "slug": "monstera-deliciosa",
     "species": "Monstera deliciosa",
     "lightLevels": "bright",
@@ -110,7 +110,7 @@
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c110",
     "name": "Porslinsblomma",
-    "image": "https://plantagen.se/_next/image?url=https%3A%2F%2Fmedia.crystallize.com%2Fpltn%2F25%2F8%2F18%2F23%2F%401024%2Fporselensplantemain.webp&w=1920&q=85",
+    "image": "https://media.blomsterfamiljen.se/2021/04/Hoya-pubicalyx-bagspalje.jpg",
     "slug": "porslinsblomma-hoya",
     "species": "Hoya carnosa",
     "lightLevels": "bright",
@@ -122,7 +122,7 @@
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c111",
     "name": "Gullranka 'Neon'",
-    "image": "https://www.wexthuset.com/images/products/wexthuset/gullranka-neon-ny.jpg",
+    "image": "https://img.tradera.net/large-fit/407/620999407_25bac8cd-9c5e-4798-b149-1b3368c094ac.jpg",
     "slug": "gullranka-neon",
     "species": "Epipremnum aureum",
     "lightLevels": "bright",
@@ -134,7 +134,7 @@
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c112",
     "name": "Silverranka",
-    "image": "https://cdn.shopify.com/s/files/1/0813/2018/2084/files/scindaptus_pictus_600x600.jpg?v=1735556853",
+    "image": "https://fridhemsblomsterhandel.interflora.se/siteassets/2896-fridhems-blomsterhandel-malmo/webbshop/1.vaxt-silverranaka.jpg",
     "slug": "silverranka",
     "species": "Scindapsus pictus",
     "lightLevels": "partial",
@@ -146,7 +146,7 @@
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c113",
     "name": "Zamiakalla",
-    "image": "https://www.hasselforsgarden.se/wp-content/uploads/sites/4/2020/07/garderobsblomma-800x800.jpg",
+    "image": "https://images.blocketcdn.se/dynamic/960w/item/21603692/47b60a5c-f11c-4812-87e9-d09b2e590d79",
     "slug": "zamiakalla",
     "species": "Zamioculcas zamiifolia",
     "lightLevels": "low",
