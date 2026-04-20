@@ -127,8 +127,8 @@ export async function getAllOfMe(userId) {
       { path: "ownerId", select: "name email location" },
       { path: "requesterId", select: "name email location" },
     ],
-    options: { sort: { createdAt: -1 } },
-  }
+    options: { sort: { updatedAt: -1 } },
+  };
 
   try {
     const user = await User.findById(userId)

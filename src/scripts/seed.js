@@ -12,7 +12,7 @@ import {
 const USERS_PATH = new URL("../data/users.json", import.meta.url)
 const PLANTS_PATH = new URL("../data/plants.json", import.meta.url)
 const TRADES_PATH = new URL("../data/trades.json", import.meta.url)
-const PLACES_PATH = new URL("../data/place.json", import.meta.url)
+const PLACES_PATH = new URL("../data/places.json", import.meta.url)
 
 async function seedUser() {
   if ((await User.countDocuments()) > 0) return

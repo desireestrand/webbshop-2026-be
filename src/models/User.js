@@ -53,7 +53,9 @@ const userSchema = new mongoose.Schema(
         delete ret._completedOwner;
         delete ret._completedRequester;
         delete ret.password;
+        delete ret.resetPasswordCode;
         delete ret.id;
+        delete ret.__v;
         return ret;
       },
     },
@@ -65,7 +67,9 @@ const userSchema = new mongoose.Schema(
         delete ret._completedOwner;
         delete ret._completedRequester;
         delete ret.password;
+        delete ret.resetPasswordCode;
         delete ret.id;
+        delete ret.__v;
         return ret;
       },
     },
