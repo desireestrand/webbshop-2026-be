@@ -1,81 +1,62 @@
-import User from "../models/User.js"
-import Plant from "../models/Plant.js"
-import Trade from "../models/Trade.js"
-import { getFullTextSearch } from "../utils/fullTextSearch.js"
+import User from "../models/User.js";
+import Plant from "../models/Plant.js";
+import Trade from "../models/Trade.js";
+import { getFullTextSearch } from "../utils/fullTextSearch.js";
+
+const USER_INFO = "name email slug role location createdAt updatedAt";
+const PLANT_INFO = "name image species meetingTime coordinates available slug";
+const TRADE_USER_INFO = "name email location slug";
+
+const HISTORY_INFO = [
+  { path: "plantId", select: PLANT_INFO },
+  { path: "ownerId", select: TRADE_USER_INFO },
+  { path: "requesterId", select: TRADE_USER_INFO },
+];
 
 export async function getUsers(q) {
-  let filter = {}
-
-  if (q) {
-    filter = {
-      ...filter,
-      ...getFullTextSearch(q, true, "name"),
-    }
-  }
-
   try {
-    return await User.find(filter)
-      .select("name email slug role location createdAt updatedAt")
-      .lean()
-  } catch (err) {
-    console.error("Unable to find based on query in 'Users'", err)
-    return []
+    let filter = {};
+    if (q) {
+      filter = {
+        ...filter,
+        ...getFullTextSearch(q, true, "name"),
+      };
+    }
+
+    return await User.find(filter).select(USER_INFO);
+  } catch (error) {
+    console.error("Unable to read from 'Users'", error.message);
+    throw error;
   }
 }
 
 export async function getUserById(id) {
-  const historyPopulate = {
-    populate: [
-      {
-        path: "plantId",
-        select: "name image species meetingTime coordinates available",
-      },
-      { path: "ownerId", select: "name email location" },
-      { path: "requesterId", select: "name email location" },
-    ],
-    options: { sort: { createdAt: -1 } },
-  }
-
   try {
     return await User.findById(id)
-      .select("name email slug role location createdAt updatedAt")
-      .populate(
-        "plants",
-        "name image species meetingTime coordinates available",
-      )
-      .populate({
-        path: "_activeOwner",
-        ...historyPopulate,
-      })
-      .populate({
-        path: "_activeRequester",
-        ...historyPopulate,
-      })
-      .populate({
-        path: "_completedOwner",
-        ...historyPopulate,
-      })
-      .populate({
-        path: "_completedRequester",
-        ...historyPopulate,
-      })
-  } catch (err) {
-    console.error("Unable to read from 'Users'", err)
-    return null
+      .select(USER_INFO)
+      .populate("plants", PLANT_INFO)
+      .populate({ path: "_activeOwner", populate: HISTORY_INFO })
+      .populate({ path: "_activeRequester", populate: HISTORY_INFO })
+      .populate({ path: "_completedOwner", populate: HISTORY_INFO })
+      .populate({ path: "_completedRequester", populate: HISTORY_INFO });
+  } catch (error) {
+    console.error(`Unable to read from 'Users' for id ${id}:`, error.message);
+    throw error;
   }
 }
 
 export async function getUserBySlug(slug) {
   try {
-    return await User.findOne({ slug: slug })
-      .select("name location")
-      .lean()
+    return await User.findOne({ slug })
+      .select("name location slug")
       .populate({
         path: "plants",
         match: { available: true },
-      })
-  } catch (err) {
-    console.error("Unable to read from 'Users'", err)
+        select: PLANT_INFO,
+      });
+  } catch (error) {
+    console.error(`Unable to read from 'Users' for slug ${slug}:`, error.message);
+    throw error;
   }
 }
 
@@ -84,86 +65,75 @@ export async function updateUser(id, userData) {
     return await User.findByIdAndUpdate(id, userData, {
       new: true, // returnera den uppdaterade användaren
       runValidators: true, // kontrollera att uppdateringen följer schemat
-    })
-      .select("name email location")
-      .lean()
-  } catch (err) {
-    console.error("Error updating 'User':", err)
-    throw err
+    }).select(USER_INFO);
+  } catch (error) {
+    console.error(`Error updating 'User' for id ${id}:`, error.message);
+    throw error;
   }
 }
 
 export async function updateUserBySlug(slug, userData) {
   try {
-    return await User.findOneAndUpdate({ slug: slug }, userData, { new: true })
-  } catch (err) {
-    console.error("Error Updating 'User':", err)
-    throw err
+    return await User.findOneAndUpdate({ slug }, userData, {
+      new: true,
+      runValidators: true,
+    }).select(USER_INFO);
+  } catch (error) {
+    console.error(`Error Updating 'User' for slug ${slug}:`, error.message);
+    throw error;
   }
+}
+
+async function performCascadeDelete(userId) {
+  // 1. Återställ plantor från aktiva trades där användaren var requester
+  const requesterTrades = await Trade.find({
+    requesterId: userId,
+    status: { $in: ["pending", "approved"] },
+  });
+
+  for (const trade of requesterTrades) {
+    await Plant.findByIdAndUpdate(trade.plantId, { available: true });
+  }
+
+  // 2. Radera alla trades kopplade till användaren
+  await Trade.deleteMany({
+    $or: [{ requesterId: userId }, { ownerId: userId }],
+  });
+
+  // 3. Radera alla plantor användaren ägde
+  await Plant.deleteMany({ ownerId: userId });
+
+  // 4. Radera användaren
+  return await User.deleteOne({ _id: userId });
 }
 
 export async function deleteUser(id) {
   try {
-    const userToDelete = await User.findById(id)
-    if (!userToDelete) return null
+    const user = await User.findById(id);
+    if (!user) return null;
 
-    // Delete trades where user is requester and set plant back to available
-    const requesterTrades = await Trade.find({ requesterId: id })
-    for (const trade of requesterTrades) {
-      if (trade.status === "pending" || trade.status === "approved") {
-        await Plant.findByIdAndUpdate(trade.plantId, { available: true })
-      }
-      await Trade.deleteOne({ _id: trade._id })
-    }
+    await performCascadeDelete(user._id);
 
-    // Delete trades and plants where user is owner
-    const ownerTrades = await Trade.find({ ownerId: id })
-    for (const trade of ownerTrades) {
-      await Trade.deleteOne({ _id: trade._id })
-    }
-    await Plant.deleteMany({ ownerId: id })
-
-    // Delete User
-    await User.deleteOne({ _id: userToDelete._id })
-    return true
-  } catch (err) {
-    console.error("Unable to delete 'User'", err)
-    return false
+    return true;
+  } catch (error) {
+    console.error(`Unable to delete 'User' with id ${id}:`, error.message);
+    throw error;
   }
 }
 
 export async function deleteUserBySlug(slug) {
   try {
-    const userToDelete = await User.findOne({ slug: slug })
-    if (!userToDelete) return null
+    const user = await User.findOne({ slug });
+    if (!user) return null;
 
-    const id = userToDelete._id
-
-    // Delete trades where user is requester and set plant back to available
-    const requesterTrades = await Trade.find({ requesterId: id })
-    for (const trade of requesterTrades) {
-      if (trade.status === "pending" || trade.status === "approved") {
-        await Plant.findByIdAndUpdate(trade.plantId, { available: true })
-      }
-      await Trade.deleteOne({ _id: trade._id })
-    }
-
-    // Delete trades and plants where user is owner
-    const ownerTrades = await Trade.find({ ownerId: id })
-    for (const trade of ownerTrades) {
-      await Trade.deleteOne({ _id: trade._id })
-    }
-    await Plant.deleteMany({ ownerId: id })
-
-    // Delete user
-    await User.deleteOne({ _id: userToDelete._id })
-    return true
-  } catch (err) {
-    console.error("Unable to delete 'User'", err)
-    return false
+    await performCascadeDelete(user._id);
+    return true;
+  } catch (error) {
+    console.error(`Unable to delete 'User' with slug ${slug}:`, error.message);
+    throw error;
   }
 }
 
 export async function findUserByEmail(email) {
-  return await User.findOne({ email })
+  return await User.findOne({ email }).select("+password");
 }
