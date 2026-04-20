@@ -99,6 +99,7 @@ export async function updateTrade(id, tradeData) {
     const updatedTrade = await Trade.findById(id)
 
     if (!updatedTrade) return null
+
     if (tradeData.status === STATUS_LEVEL.cancelled) {
       if (
         updatedTrade.status !== STATUS_LEVEL.pending &&
@@ -113,8 +114,31 @@ export async function updateTrade(id, tradeData) {
 
     updatedTrade.status = tradeData.status ?? updatedTrade.status
     await updatedTrade.save()
-    // console.log("Function: updateTrade:", updateTrade);
-    return await Trade.populate(updatedTrade, "plantId requesterId ownerId")
+
+    const populatedTrade = await Trade.populate(updatedTrade, [
+      {
+        path: "plantId",
+        select: "name image species meetingTime coordinates available slug",
+      },
+      { path: "requesterId", select: "name location slug" },
+      { path: "ownerId", select: "name location slug" },
+    ])
+
+    const tradeObject = populatedTrade.toObject()
+
+    // Rensa virtuals från ownerId
+    if (tradeObject.ownerId) {
+      delete tradeObject.ownerId.activeTrades
+      delete tradeObject.ownerId.history
+    }
+
+    // Rensa virtuals från requesterId
+    if (tradeObject.requesterId) {
+      delete tradeObject.requesterId.activeTrades
+      delete tradeObject.requesterId.history
+    }
+
+    return tradeObject
   } catch (err) {
     console.error("Unable to update 'Trade'", err)
     throw err
