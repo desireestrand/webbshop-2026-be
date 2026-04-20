@@ -11,6 +11,7 @@ export async function getAllTrades() {
       .populate("requesterId", "name")
       .populate("ownerId", "name")
       .populate("status")
+      .lean()
   } catch (err) {
     console.error("Unable to read from 'Trades'", err)
   }
@@ -33,11 +34,9 @@ export async function getTradeById(id) {
 
 export async function getTradesByOwnerId(ownerId) {
   try {
-    return await Trade.find({   
-      $or: [
-        { ownerId: ownerId },
-        { requesterId: ownerId }
-      ]})
+    return await Trade.find({
+      $or: [{ ownerId: ownerId }, { requesterId: ownerId }],
+    })
       .populate("ownerId", "name")
       .populate("requesterId", "name")
       .populate(
@@ -51,14 +50,47 @@ export async function getTradesByOwnerId(ownerId) {
   }
 }
 
-export async function createTrade(tradeData) {
+/* export async function createTrade(tradeData) {
   try {
     const newTrade = new Trade(tradeData)
     await newTrade.save()
     return await Trade.populate(newTrade, "plantId requesterId ownerId")
   } catch (err) {
     console.error("Unable to create 'Trade'", err)
-    throw err;
+    throw err
+  }
+}
+ */
+export async function createTrade(tradeData) {
+  try {
+    const newTrade = new Trade(tradeData)
+    await newTrade.save()
+
+    const populatedTrade = await Trade.populate(newTrade, [
+      {
+        path: "plantId",
+        select: "name image species meetingTime coordinates available slug",
+      },
+      { path: "requesterId", select: "name location slug" },
+      { path: "ownerId", select: "name location slug" },
+    ])
+
+    const tradeObject = populatedTrade.toObject()
+
+    if (tradeObject.ownerId) {
+      delete tradeObject.ownerId.activeTrades
+      delete tradeObject.ownerId.history
+    }
+
+    if (tradeObject.requesterId) {
+      delete tradeObject.requesterId.activeTrades
+      delete tradeObject.requesterId.history
+    }
+
+    return tradeObject
+  } catch (error) {
+    console.error("Unable to create 'Trade'", error.message)
+    throw error
   }
 }
 
