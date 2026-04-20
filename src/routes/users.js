@@ -117,13 +117,27 @@ userRouter.put("/:slug", requireAuth, validateUpdateUser, async (req, res) => {
 
 //PATCH /users/id/:id
 userRouter.patch("/id/:id", requireAuth, /*requireAdmin*/ validateUpdateUser, async (req, res) => {
-    const user = await updateUser(req.params.id, req.body)
 
-    if (!user) {
+  const id = req.params.id
+
+  const user = await getUserById(id)
+  if(!user){
+    return res.status(404).json({
+      message: "User not found",
+    })
+  }
+  if (user._id.toString() !== req.userId ) {
+    return res
+      .status(403)
+      .json({ message: "Not allowed to update this user" });
+  }
+  const updatedUser = await updateUser(id, req.body)
+
+    if (!updatedUser) {
       return res.status(404).json({ message: "User not found" })
     }
 
-    res.status(200).json(user)
+    res.status(200).json(updatedUser)
   },
 )
 
