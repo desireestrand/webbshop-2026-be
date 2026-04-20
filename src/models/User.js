@@ -48,28 +48,48 @@ const userSchema = new mongoose.Schema(
     toJSON: {
       virtuals: true,
       transform: (doc, ret) => {
+        delete ret.password;
+        delete ret.resetPasswordCode;
+        delete ret.__v;
+        delete ret.id;
+
         delete ret._activeOwner;
         delete ret._activeRequester;
         delete ret._completedOwner;
         delete ret._completedRequester;
-        delete ret.password;
-        delete ret.resetPasswordCode;
-        delete ret.id;
-        delete ret.__v;
+
+        if (!doc.populated("_activeOwner") && !doc.populated("_activeRequester")) {
+          delete ret.activeTrades;
+        }
+
+        if (!doc.populated("_completedOwner") && !doc.populated("_completedRequester")) {
+          delete ret.history;
+        }
+
         return ret;
       },
     },
     toObject: {
       virtuals: true,
       transform: (doc, ret) => {
+        delete ret.password;
+        delete ret.resetPasswordCode;
+        delete ret.__v;
+        delete ret.id;
+
         delete ret._activeOwner;
         delete ret._activeRequester;
         delete ret._completedOwner;
         delete ret._completedRequester;
-        delete ret.password;
-        delete ret.resetPasswordCode;
-        delete ret.id;
-        delete ret.__v;
+
+        if (!doc.populated("_activeOwner") && !doc.populated("_activeRequester")) {
+          delete ret.activeTrades;
+        }
+
+        if (!doc.populated("_completedOwner") && !doc.populated("_completedRequester")) {
+          delete ret.history;
+        }
+        
         return ret;
       },
     },

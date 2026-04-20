@@ -14,9 +14,7 @@ export async function getAvailablePlants(q) {
       };
     }
 
-    return await Plant.find(filter)
-      .populate("ownerId", OWNER_PUBLIC_INFO)
-      .lean();
+    return await Plant.find(filter).populate("ownerId", OWNER_PUBLIC_INFO);
   } catch (error) {
     console.error("Unable to read from 'Plants'", error.message);
     throw error;
@@ -33,9 +31,7 @@ export async function getAllPlants(q) {
       };
     }
 
-    return await Plant.find(filter)
-      .populate("ownerId", OWNER_ADMIN_INFO)
-      .lean();
+    return await Plant.find(filter).populate("ownerId", OWNER_ADMIN_INFO);
   } catch (error) {
     console.error("Unable to read all from 'Plants'", error.message);
     throw error;
@@ -44,7 +40,7 @@ export async function getAllPlants(q) {
 
 export async function getPlantsByOwnerId(ownerId) {
   try {
-    return await Plant.find({ ownerId }).lean();
+    return await Plant.find({ ownerId });
   } catch (error) {
     console.error(`Unable to read from 'Plants' for owner ${ownerId}:`, error.message);
     throw error;
@@ -53,9 +49,7 @@ export async function getPlantsByOwnerId(ownerId) {
 
 export async function getPlantBySlug(slug) {
   try {
-    return await Plant.findOne({ slug })
-      .populate("ownerId", OWNER_PUBLIC_INFO)
-      .lean();
+    return await Plant.findOne({ slug }).populate("ownerId", OWNER_PUBLIC_INFO);
   } catch (error) {
     console.error(`Unable to read from 'Plant' for slug ${slug}:`, error.message);
     throw error;
@@ -66,20 +60,7 @@ export async function createPlant(plantData) {
   try {
     const newPlant = new Plant(plantData);
     await newPlant.save();
-
-    const populatedPlant = await Plant.populate(newPlant, {
-      path: "ownerId",
-      select: OWNER_ADMIN_INFO,
-    });
-
-    const plantObject = populatedPlant.toObject();
-
-    if (plantObject.ownerId) {
-      delete plantObject.ownerId.activeTrades;
-      delete plantObject.ownerId.history;
-    }
-
-    return plantObject;
+    return await newPlant.populate("ownerId", OWNER_ADMIN_INFO);
   } catch (error) {
     console.error("Unable to create 'Plant'", error.message);
     throw error;
@@ -91,23 +72,9 @@ export async function updatePlantBySlug(slug, updateData) {
     const updatedPlant = await Plant.findOneAndUpdate({ slug }, updateData, {
       new: true,
       runValidators: true,
-    });
+    }).populate("ownerId", OWNER_ADMIN_INFO);
 
-    if (!updatedPlant) return null;
-
-    const populatedPlant = await updatedPlant.populate({
-      path: "ownerId",
-      select: OWNER_ADMIN_INFO,
-    });
-  
-     const plantObject = populatedPlant.toObject();
-
-    if (plantObject.ownerId) {
-      delete plantObject.ownerId.activeTrades;
-      delete plantObject.ownerId.history;
-    }
-
-    return plantObject;
+    return updatedPlant;
   } catch (error) {
     console.error(`Unable to update 'Plant' for slug ${slug}:`, error.message);
     throw error;
@@ -117,7 +84,7 @@ export async function updatePlantBySlug(slug, updateData) {
 export async function deletePlantBySlug(slug) {
   try {
     const deletedPlant = await Plant.findOneAndDelete({ slug });
-    
+
     if (deletedPlant) {
       return true;
     } else {

@@ -17,7 +17,7 @@ import { requireAdmin, requireAuth } from "../middleware/auth.js";
 
 const plantRouter = Router();
 
-// GET /plants with search - Public
+// GET /plants - Public
 plantRouter.get("/", async (req, res) => {
   try {
     const { q } = req.query;
@@ -25,7 +25,7 @@ plantRouter.get("/", async (req, res) => {
 
     if (plants.length === 0) {
       return res.status(404).json({
-        message: "No plants match your search word",
+        message: "No plants found",
       });
     }
 
@@ -35,15 +35,15 @@ plantRouter.get("/", async (req, res) => {
   }
 });
 
-// GET /plants/all with search - Admin
-plantRouter.get("/all", requireAuth, /*requireAdmin*/ async (req, res) => {
+// GET /plants/all - Admin
+plantRouter.get("/all", requireAuth, /* requireAdmin */ async (req, res) => {
   try {
     const { q } = req.query;
     const plants = await getAllPlants(q);
 
     if (plants.length === 0) {
       return res.status(404).json({
-        message: "No plants match your search word",
+        message: "No plants found",
       });
     }
 
@@ -75,7 +75,7 @@ plantRouter.get("/:slug", requireAuth, async (req, res) => {
   try {
     const slug = req.params.slug;
     const plant = await getPlantBySlug(slug);
-
+  
     if (!plant) {
       return res.status(404).json({
         message: "Plant not found",
@@ -103,7 +103,7 @@ plantRouter.post("/", requireAuth, validatePlant, validatePlantResult, async (re
   }
 });
 
-/* // PUT /plants/:slug
+/* // PUT /plants/:slug - Owner or Admin
 plantRouter.put("/:slug", requireAuth, validatePlant, validatePlantResult, async (req, res) => {
     const slug = req.params.slug;
 
@@ -141,7 +141,7 @@ plantRouter.put("/:slug", requireAuth, validatePlant, validatePlantResult, async
   },
 ) */
 
-// PATCH /plants/:slug - Auth + Owner/Admin
+// PATCH /plants/:slug - Owner or Admin
 plantRouter.patch("/:slug", requireAuth, validatePlantUpdate, validatePlantResult, async (req, res) => {
   try {
     const slug = req.params.slug;
@@ -151,25 +151,18 @@ plantRouter.patch("/:slug", requireAuth, validatePlantUpdate, validatePlantResul
       return res.status(404).json({ message: "Plant not found" });
     }
 
-    if (req.body.ownerId || req.body.slug) {
-      return res.status(400).json({
-        message: "Not allowed to update restricted fields (ownerId, slug).",
-      });
-    }
-
-    if (plant.ownerId._id.toString() !== req.userId /*&& req.userRole !== "admin"*/) {
+    if (plant.ownerId._id.toString() !== req.userId /* && req.userRole !== "admin" */) {
       return res.status(403).json({ message: "Not allowed to update this plant" });
     }
 
-    const { ownerId, slug: bodySlug, ...updateData } = req.body;
-
-    const updatedPlant = await updatePlantBySlug(slug, updateData);
-
-    if (!updatedPlant) {
-      return res.status(404).json({
-        message: "Plant does not exist",
+    if (req.body.ownerId || req.body.slug) {
+      return res.status(400).json({
+        message: "Updating ownerId or slug is not allowed",
       });
     }
+
+    const { ownerId, slug: bodySlug, ...updateData } = req.body;
+    const updatedPlant = await updatePlantBySlug(slug, updateData);
 
     return res.status(200).json(updatedPlant);
   } catch (error) {
@@ -177,7 +170,7 @@ plantRouter.patch("/:slug", requireAuth, validatePlantUpdate, validatePlantResul
   }
 });
 
-// DELETE /plants/:slug - Auth + Owner/Admin
+// DELETE /plants/:slug - Owner or Admin
 plantRouter.delete("/:slug", requireAuth, async (req, res) => {
   try {
     const slug = req.params.slug;
@@ -187,7 +180,7 @@ plantRouter.delete("/:slug", requireAuth, async (req, res) => {
       return res.status(404).json({ message: "Plant not found" });
     }
 
-    if (plant.ownerId._id.toString() !== req.userId /*&& req.userRole !== "admin"*/) {
+    if (plant.ownerId._id.toString() !== req.userId /* && req.userRole !== "admin" */) {
       return res.status(403).json({ message: "Not allowed to delete this plant" });
     }
 

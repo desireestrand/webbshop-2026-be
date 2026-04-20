@@ -57,9 +57,25 @@ const plantSchema = new mongoose.Schema(
       required: true,
     },
   },
-  {
+ {
     timestamps: true,
-  },
+    toJSON: {
+      virtuals: true,
+      transform: (doc, ret) => {
+        delete ret.__v;
+        delete ret.id;
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform: (doc, ret) => {
+        delete ret.__v;
+        delete ret.id;
+        return ret;
+      },
+    },
+  }
 );
 
 plantSchema.pre("validate", async function (next) {
