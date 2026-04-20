@@ -8,75 +8,100 @@ import {
   getUserBySlug,
   updateUserBySlug,
   deleteUserBySlug,
-} from "../db/users.js";
-import { requireAuth, requireAdmin } from "../middleware/auth.js";
+} from "../db/users.js"
+import { requireAuth, requireAdmin } from "../middleware/auth.js"
 
 const userRouter = Router()
 
-userRouter.get("/", /* requireAuth, requireAdmin, */ async (req, res) => {
-  const { q } = req.query
+userRouter.get(
+  "/",
+  /* requireAuth, requireAdmin, */ async (req, res) => {
+    const { q } = req.query
 
-  const users = await getUsers(q)
+    const users = await getUsers(q)
 
-  res.json(users)
-})
+    if (users.length === 0) {
+      return res.status(404).json({
+        message: "User not found",
+      })
+    }
+
+    res.json(users)
+  },
+)
 
 // GET /users/id/:id
-userRouter.get("/id/:id", /* requireAuth, requireAdmin, */ async (req, res) => {
-  const user = await getUserById(req.params.id)
+userRouter.get(
+  "/id/:id",
+  /* requireAuth, requireAdmin, */ async (req, res) => {
+    const user = await getUserById(req.params.id)
 
-  if (!user) {
-    return res.status(404).json({ message: "User not found" })
-  }
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
 
-  res.json(user)
-})
+    res.json(user)
+  },
+)
 
 // GET /users/:slug
-userRouter.get("/:slug", /* requireAuth, */ async (req, res) => {
-  const user = await getUserBySlug(req.params.slug)
+userRouter.get(
+  "/:slug",
+  /* requireAuth, */ async (req, res) => {
+    const user = await getUserBySlug(req.params.slug)
 
-  if (!user) {
-    return res.status(404).json({
-      message: "User not found",
-    })
-  }
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      })
+    }
 
-  res.json(user)
-})
+    res.json(user)
+  },
+)
 
 // POST /users
-userRouter.post("/", /* requireAuth, */ async (req, res) => {
-  const user = await createUser(req.body)
-  res.status(201).json(user)
-})
+userRouter.post(
+  "/",
+  /* requireAuth, */ async (req, res) => {
+    const user = await createUser(req.body)
+    res.status(201).json(user)
+  },
+)
 
 // PUT /users/id/:id
-userRouter.put("/id/:id", /* requireAuth, requireAdmin, */ async (req, res) => {
-  const user = await updateUser(req.params.id, req.body)
+userRouter.put(
+  "/id/:id",
+  /* requireAuth, requireAdmin, */ async (req, res) => {
+    const user = await updateUser(req.params.id, req.body)
 
-  if (!user) {
-    return res.status(404).json({ message: "User not found" })
-  }
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
 
-  res.status(200).json(user)
-})
+    res.status(200).json(user)
+  },
+)
 
 // PUT /users/:slug
-userRouter.put("/:slug", /* requireAuth, */ validateUpdateUser, async (req, res) => {
-  const slug = req.params.slug
-  const { name, email, location } = req.body
+userRouter.put(
+  "/:slug",
+  /* requireAuth, */ validateUpdateUser,
+  async (req, res) => {
+    const slug = req.params.slug
+    const { name, email, location } = req.body
 
-  const updatedUser = await updateUserBySlug(slug, { name, email, location })
+    const updatedUser = await updateUserBySlug(slug, { name, email, location })
 
-  if (!updatedUser) {
-    return res.status(404).json({
-      message: "User not found",
-    })
-  }
+    if (!updatedUser) {
+      return res.status(404).json({
+        message: "User not found",
+      })
+    }
 
-  return res.status(200).json(updatedUser)
-})
+    return res.status(200).json(updatedUser)
+  },
+)
 
 //PATCH /users/id/:id
 userRouter.patch(
@@ -116,27 +141,33 @@ userRouter.patch(
 )
 
 // DELETE /users/id/:id
-userRouter.delete("/id/:id", /* requireAuth, requireAdmin, */ async (req, res) => {
-  const user = await deleteUser(req.params.id)
+userRouter.delete(
+  "/id/:id",
+  /* requireAuth, requireAdmin, */ async (req, res) => {
+    const user = await deleteUser(req.params.id)
 
-  if (!user) {
-    return res.status(404).json({ message: "User not found" })
-  }
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
 
-  res.status(204).json()
-})
+    res.status(204).json()
+  },
+)
 
 // DELETE /users/:slug
-userRouter.delete("/:slug", /* requireAuth, */ async (req, res) => {
-  const slug = req.params.slug
-  const user = await deleteUserBySlug(slug)
-  if (!user) {
-    return res.status(400).json({
-      message: "user does not exist",
-    })
-  }
-  return res.status(204).json()
-})
+userRouter.delete(
+  "/:slug",
+  /* requireAuth, */ async (req, res) => {
+    const slug = req.params.slug
+    const user = await deleteUserBySlug(slug)
+    if (!user) {
+      return res.status(400).json({
+        message: "user does not exist",
+      })
+    }
+    return res.status(204).json()
+  },
+)
 
 // userRouter.put("/:id", async (req, res) => {
 //   const user = await updateUser(req.params.id, req.body)
