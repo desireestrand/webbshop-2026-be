@@ -34,10 +34,8 @@ plantRouter.get("/", async (req, res) => {
 })
 
 // GET /plants/all with search
-plantRouter.get(
-  "/all",
-  /* requireAuth, requireAdmin, */ async (req, res) => {
-    const { q } = req.query
+plantRouter.get("/all", requireAuth, /*requireAdmin*/ async (req, res) => {
+    const { q } = req.query;
 
     const plants = await getAllPlants(q)
 
@@ -65,10 +63,8 @@ plantRouter.get("/mine", requireAuth, async (req, res) => {
 })
 
 // GET /plants/:slug
-plantRouter.get(
-  "/:slug",
-  /* requireAuth, */ async (req, res) => {
-    const slug = req.params.slug
+plantRouter.get("/:slug", requireAuth, async (req, res) => {
+    const slug = req.params.slug;
 
     const plant = await getPlantBySlug(slug)
 
@@ -83,31 +79,22 @@ plantRouter.get(
 )
 
 // POST /plants
-plantRouter.post(
-  "/",
-  /* requireAuth, */ validatePlant,
-  validatePlantResult,
+plantRouter.post("/", requireAuth, validatePlant, validatePlantResult,
   async (req, res) => {
     const plantData = {
       ...req.body,
       ownerId: req.userId,
     }
 
-    // change to plantData instead of req.body later
-    const plant = await createPlant(req.body)
+    const plant = await createPlant(plantData);
 
     res.status(201).json(plant)
   },
 )
 
 // PUT /plants/:slug
-plantRouter.put(
-  "/:slug",
-  /* requireAuth, */ validatePlant,
-  validatePlantResult,
-  async (req, res) => {
-    // TODO Validation for Admin
-    const slug = req.params.slug
+plantRouter.put("/:slug", requireAuth, validatePlant, validatePlantResult, async (req, res) => {
+    const slug = req.params.slug;
 
     const plant = await getPlantBySlug(slug)
 
@@ -115,15 +102,14 @@ plantRouter.put(
       return res.status(404).json({ message: "Plant not found" })
     }
 
-    // Kontrollera att användaren äger plantan
-    /* if (plant.ownerId._id.toString() !== req.userId) {
+    // Kontrollera att användaren äger plantan eller är admin
+    if (plant.ownerId._id.toString() !== req.userId /*&& req.userRole !== "admin"*/) {
       return res
         .status(403)
         .json({ message: "Not allowed to update this plant" });
-    } */
+    }
 
-    const { name, image, species, lightLevels, coordinates, meetingTime } =
-      req.body
+    const { name, image, species, lightLevels, coordinates, meetingTime } = req.body;
 
     const updatedPlant = await updatePlantBySlug(slug, {
       name,
@@ -145,13 +131,9 @@ plantRouter.put(
 )
 
 // PATCH /plants/:slug
-plantRouter.patch(
-  "/:slug",
-  /* requireAuth, */ validatePlantUpdate,
-  validatePlantResult,
+plantRouter.patch("/:slug", requireAuth,  validatePlantUpdate, validatePlantResult,
   async (req, res) => {
-    // TODO Validation for User (owner) and Admin
-    const slug = req.params.slug
+    const slug = req.params.slug;
 
     const plant = await getPlantBySlug(slug)
 
@@ -166,12 +148,12 @@ plantRouter.patch(
       })
     }
 
-    // Kontrollera att användaren äger plantan
-    /* if (plant.ownerId._id.toString() !== req.userId) {
-    return res.status(403).json({ message: "Not allowed to update this plant" })
-  } */
+    // Kontrollera att användaren äger plantan eller är admin
+    if (plant.ownerId._id.toString() !== req.userId /*&& req.userRole !== "admin"*/)  {
+      return res.status(403).json({ message: "Not allowed to update this plant" })
+    } 
 
-    const { ownerId, slug: bodySlug, ...updateData } = req.body
+    const { slug: bodySlug, ...updateData } = req.body;
 
     const updatedPlant = await updatePlantBySlug(slug, updateData)
 
@@ -186,10 +168,7 @@ plantRouter.patch(
 )
 
 // DELETE /plants/:slug
-plantRouter.delete(
-  "/:slug",
-  /* requireAuth, */ async (req, res) => {
-    // TODO Validation for User (owner) and Admin
+plantRouter.delete("/:slug", requireAuth,  async (req, res) => {
 
     const slug = req.params.slug
 
@@ -199,13 +178,13 @@ plantRouter.delete(
       return res.status(404).json({ message: "Plant not found" })
     }
 
-    // Kontrollera att användaren äger plantan
-    /* if (findPlant.ownerId._id.toString() !== req.userId) {
+    // Kontrollera att användaren äger plantan eller är admin
+    if (findPlant.ownerId._id.toString() !== req.userId /*&& req.userRole !== "admin"*/) {
       return res
         .status(403)
         .json({ message: "Not allowed to delete this plant" });
-    } */
-    const plant = await deletePlantBySlug(slug)
+    } 
+    const plant = await deletePlantBySlug(slug);
 
     if (!plant) {
       return res.status(400).json({
@@ -213,8 +192,8 @@ plantRouter.delete(
       })
     }
 
-    return res.status(204).json()
-  },
-)
+    return res.status(204).json();
+  }
+);
 
 export default plantRouter
