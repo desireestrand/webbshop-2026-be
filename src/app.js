@@ -5,7 +5,7 @@ import plantRouter from "./routes/plants.js"
 import tradeRouter from "./routes/trades.js"
 import authRouter from "./routes/auth.js"
 import userRouter from "./routes/users.js"
-import placeRouter from "./routes/place.js"
+import placeRouter from "./routes/places.js"
 import cors from "cors"
 
 const app = express()
