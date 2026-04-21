@@ -39,7 +39,6 @@ const userSchema = new mongoose.Schema(
     },
     location: {
       type: [Number],
-      default: [0, 0],
       required: true,
     },
   },
@@ -48,24 +47,24 @@ const userSchema = new mongoose.Schema(
     toJSON: {
       virtuals: true,
       transform: (doc, ret) => {
+        delete ret.password;
+        delete ret.resetPasswordCode;
+        delete ret.__v;
+        delete ret.id;
+        //to hide activeTrades if there are no active trades registered
+        if (!ret.activeTrades || ret.activeTrades.length === 0) {
+          delete ret.activeTrades;
+        }
+         //to hide history if there is no history registered
+        if (!ret.history || ret.history.length === 0) {
+          delete ret.history;
+        }
+
         delete ret._activeOwner;
         delete ret._activeRequester;
         delete ret._completedOwner;
         delete ret._completedRequester;
-        delete ret.password;
-        delete ret.id;
-        return ret;
-      },
-    },
-    toObject: {
-      virtuals: true,
-      transform: (doc, ret) => {
-        delete ret._activeOwner;
-        delete ret._activeRequester;
-        delete ret._completedOwner;
-        delete ret._completedRequester;
-        delete ret.password;
-        delete ret.id;
+
         return ret;
       },
     },
@@ -156,31 +155,24 @@ userSchema.pre("validate", async function (next) {
       lower: true,
     });
 
-    console.log("baseSlug: ", baseSlug);
     let slug = baseSlug;
-    //Kolla om slug redan finns
-    const User = this.constructor; // means const User = mongoose.model("Plant");
+
+    // Same as const User = mongoose.model("Plant");
+    const User = this.constructor;
     let counter = 1;
-    //while slug exists in Users, run this code
+
+    // While slug exists in Users, run this code
     while (await User.exists({ slug })) {
       slug = `${baseSlug}-${counter}`;
       counter++;
     }
-    //change the value of slug, makes while-loop stop if new value does not exist
+    
+    // Change the value of slug, makes while-loop stop if new value does not exist
     this.slug = slug;
   }
 
   return next();
 });
-
-// Använder lowercase: true för email istället
-/* userSchema.pre("save", async function (next) {
-  if (!this.isModified("email")) {
-    return next();
-  }
-
-  this.email = this.email.toLowerCase();
-}) */
 
 userSchema.methods.isSamePassword = async function (password) {
   return await bcrypt.compare(password, this.password);

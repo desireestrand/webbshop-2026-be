@@ -1,0 +1,32 @@
+[
+    {
+        "_id": "661ff1a0c1a4b2d3e4f50101",
+        "city": "Stockholm",
+        "placeName": "Stockholm Public placeName (Asplundhuset)",
+        "coordinates": [59.3434, 18.0543]
+    },
+    {
+        "_id": "661ff1a0c1a4b2d3e4f50102",
+        "city": "Stockholm",
+        "placeName": "National placeName of Sweden (Kungliga bibl.)",
+        "coordinates": [59.3384, 18.0722]
+    },
+    {
+        "_id": "661ff1a0c1a4b2d3e4f50103",
+        "city": "Uppsala",
+        "placeName": "Uppsala Public placeName",
+        "coordinates": [59.8604, 17.6366]
+    },
+    {
+        "_id": "661ff1a0c1a4b2d3e4f50104",
+        "city": "Uppsala",
+        "placeName": "Carolina Rediviva (Uppsala University)",
+        "coordinates": [59.8549, 17.6311]
+    },
+    {
+        "_id": "661ff1a0c1a4b2d3e4f50105",
+        "city": "Västerås",
+        "placeName": "Västerås City placeName",
+        "coordinates": [59.6119, 16.5448]
+    }
+]

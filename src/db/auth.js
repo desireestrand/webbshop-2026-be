@@ -19,10 +19,12 @@ function _generateTokens(user) {
 }
 
 function _getUserObject(user) {
-  /*   const userObject = user.toObject()
-  delete userObject.password
-  return userObject */
   return user.toJSON();
+}
+
+// +password makes select true (makes password available to get)
+export async function findUserByEmail(email) {
+  return await User.findOne({ email }).select("+password");
 }
 
 export async function registerUser(name, email, password, location) {
@@ -37,9 +39,7 @@ export async function registerUser(name, email, password, location) {
 }
 
 export async function logInUser(email, password) {
-  const user = await User.findOne({ email: email.toLowerCase() }).select(
-    "+password", //gör så att man ska kunna få password
-  );
+  const user = await User.findOne({ email: email.toLowerCase() }).select("+password");
 
   const response = "Invalid credentials";
 
@@ -118,45 +118,32 @@ export async function confirmPasswordReset(email, code, newPassword) {
 }
 
 export async function getAllOfMe(userId) {
+  const PLANT_INFO = "name image species meetingTime coordinates available slug";
+  const USER_INFO = "name email location slug";
+
   const historyPopulate = {
-    populate: [
-      {
-        path: "plantId",
-        select: "name image species meetingTime coordinates available",
-      },
-      { path: "ownerId", select: "name email location" },
-      { path: "requesterId", select: "name email location" },
+   populate: [
+      { path: "plantId", select: PLANT_INFO },
+      { path: "ownerId", select: USER_INFO },
+      { path: "requesterId", select: USER_INFO },
     ],
-    options: { sort: { createdAt: -1 } },
+    options: { 
+      sort: { updatedAt: -1 }
+    },
   };
 
   try {
     const user = await User.findById(userId)
       .select("name email slug role location createdAt updatedAt")
-      .populate(
-        "plants",
-        "name image species meetingTime coordinates available",
-      )
-      .populate({
-        path: "_activeOwner",
-        ...historyPopulate,
-      })
-      .populate({
-        path: "_activeRequester",
-        ...historyPopulate,
-      })
-      .populate({
-        path: "_completedOwner",
-        ...historyPopulate,
-      })
-      .populate({
-        path: "_completedRequester",
-        ...historyPopulate,
-      });
+      .populate("plants", PLANT_INFO)
+      .populate({ path: "_activeOwner", ...historyPopulate })
+      .populate({ path: "_activeRequester", ...historyPopulate })
+      .populate({ path: "_completedOwner", ...historyPopulate })
+      .populate({ path: "_completedRequester", ...historyPopulate });
 
     return user;
-  } catch (err) {
-    console.error("Unable to find current user", err);
-    return [];
+  } catch (error) {
+    console.error("Unable to find current user", error.message);
+    throw error;
   }
 }
