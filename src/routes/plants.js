@@ -103,44 +103,6 @@ plantRouter.post("/", requireAuth, validatePlant, validatePlantResult, async (re
   }
 });
 
-/* // PUT /plants/:slug - Owner or Admin
-plantRouter.put("/:slug", requireAuth, validatePlant, validatePlantResult, async (req, res) => {
-    const slug = req.params.slug;
-
-    const plant = await getPlantBySlug(slug)
-
-    if (!plant) {
-      return res.status(404).json({ message: "Plant not found" })
-    }
-
-    // Kontrollera att användaren äger plantan eller är admin
-    if (plant.ownerId._id.toString() !== req.userId && req.userRole !== "admin") {
-      return res
-        .status(403)
-        .json({ message: "Not allowed to update this plant" });
-    }
-
-    const { name, image, species, lightLevels, coordinates, meetingTime } = req.body;
-
-    const updatedPlant = await updatePlantBySlug(slug, {
-      name,
-      image,
-      species,
-      lightLevels,
-      coordinates,
-      meetingTime,
-    })
-
-    if (!updatedPlant) {
-      return res.status(404).json({
-        message: "Plant does not exist",
-      })
-    }
-
-    return res.status(200).json(updatedPlant)
-  },
-) */
-
 // PATCH /plants/:slug - Owner or Admin
 plantRouter.patch("/:slug", requireAuth, validatePlantUpdate, validatePlantResult, async (req, res) => {
   try {
@@ -199,3 +161,40 @@ plantRouter.delete("/:slug", requireAuth, async (req, res) => {
 });
 
 export default plantRouter;
+
+// PUT /plants/:slug - Owner or Admin
+/* plantRouter.put("/:slug", requireAuth, validatePlant, validatePlantResult, async (req, res) => {
+    const slug = req.params.slug;
+
+    const plant = await getPlantBySlug(slug)
+
+    if (!plant) {
+      return res.status(404).json({ message: "Plant not found" })
+    }
+
+    if (plant.ownerId._id.toString() !== req.userId && req.userRole !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Not allowed to update this plant" });
+    }
+
+    const { name, image, species, lightLevels, coordinates, meetingTime } = req.body;
+
+    const updatedPlant = await updatePlantBySlug(slug, {
+      name,
+      image,
+      species,
+      lightLevels,
+      coordinates,
+      meetingTime,
+    })
+
+    if (!updatedPlant) {
+      return res.status(404).json({
+        message: "Plant does not exist",
+      })
+    }
+
+    return res.status(200).json(updatedPlant)
+  },
+) */

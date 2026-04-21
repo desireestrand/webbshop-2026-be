@@ -18,10 +18,12 @@ export function requireAuth(req, res, next) {
         message: "Unauthorized: Expired",
       });
     }
+
     return res.status(401).json({
       message: "Unauthorized: Invalid token",
     });
   }
+  
   next();
 }
 

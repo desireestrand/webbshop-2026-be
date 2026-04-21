@@ -6,8 +6,8 @@ import {
   updateUser,
   deleteUser,
   getUserBySlug,
-  updateUserBySlug,
-  deleteUserBySlug,
+  /* updateUserBySlug, */
+  /*deleteUserBySlug,*/
 } from "../db/users.js";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
 
@@ -63,12 +63,55 @@ userRouter.get("/:slug", requireAuth, async (req, res) => {
   }
 });
 
-/* // POST /users
-userRouter.post("/", requireAuth, async (req, res) => {
-  const user = await createUser(req.body);
-  res.status(201).json(user);
+// PATCH /users/id/:id - Admin
+userRouter.patch("/id/:id", requireAuth, /* requireAdmin */ validateUpdateUser, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const user = await getUserById(id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (user._id.toString() !== req.userId && req.userRole !== "admin") {
+      return res.status(403).json({ message: "Not allowed to update this user" });
+    }
+
+    const updatedUser = await updateUser(id, req.body);
+
+    return res.status(200).json(updatedUser);
+  } catch (error) {
+    return res.status(500).json({ message: "Error while updating user" });
+  }
 });
-*/
+
+// DELETE /users/id/:id - Admin
+userRouter.delete("/id/:id", requireAuth, /* requireAdmin */ async (req, res) => {
+  try {
+    const id = req.params.id;
+    const user = await getUserById(id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (user._id.toString() !== req.userId && req.userRole !== "admin") {
+      return res.status(403).json({ message: "Not allowed to delete this user" });
+    }
+
+    const deletedUser = await deleteUser(id);
+
+    return res.status(204).json();
+  } catch (error) {
+    return res.status(500).json({ message: "Error while deleting user" });
+  }
+});
+
+export default userRouter;
 
 /* // PUT /users/id/:id
 userRouter.put(
@@ -124,30 +167,7 @@ userRouter.put("/:slug", requireAuth, validateUpdateUser, async (req, res) => {
   return res.status(200).json(updatedUser);
 }); */
 
-// PATCH /users/id/:id - Admin
-userRouter.patch("/id/:id", requireAuth, /* requireAdmin */ validateUpdateUser, async (req, res) => {
-  try {
-    const id = req.params.id;
-    const user = await getUserById(id);
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    if (user._id.toString() !== req.userId && req.userRole !== "admin") {
-      return res.status(403).json({ message: "Not allowed to update this user" });
-    }
-
-    const updatedUser = await updateUser(id, req.body);
-
-    return res.status(200).json(updatedUser);
-  } catch (error) {
-    return res.status(500).json({ message: "Error while updating user" });
-  }
-});
-
+// Replaced by PATCH /auth/me
 /* // PATCH /users/:slug
 userRouter.patch(
   "/:slug",
@@ -181,30 +201,7 @@ userRouter.patch(
   },
 ); */
 
-// DELETE /users/id/:id - Admin
-userRouter.delete("/id/:id", requireAuth, /* requireAdmin */ async (req, res) => {
-  try {
-    const id = req.params.id;
-    const user = await getUserById(id);
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    if (user._id.toString() !== req.userId && req.userRole !== "admin") {
-      return res.status(403).json({ message: "Not allowed to delete this user" });
-    }
-
-    const deletedUser = await deleteUser(id);
-
-    return res.status(204).json();
-  } catch (error) {
-    return res.status(500).json({ message: "Error while deleting user" });
-  }
-});
-
+// Replaced by DELETE /auth/me
 /* // DELETE /users/:slug
 userRouter.delete("/:slug", requireAuth, async (req, res) => {
   const slug = req.params.slug;
@@ -227,32 +224,3 @@ userRouter.delete("/:slug", requireAuth, async (req, res) => {
   }
   return res.status(204).json();
 }); */
-
-// userRouter.put("/:id", async (req, res) => {
-//   const user = await updateUser(req.params.id, req.body)
-//   if (!user) return res.status(404).json({ message: "User not found" })
-//   res.json(user)
-// })
-
-// userRouter.patch("/:id", async (req, res) => {
-//   const id = req.params.id
-//   const updateData = req.body
-
-//   const updatedUser = await updateUser(id, updateData)
-
-//   if (!updatedUser) {
-//     return res.status(404).json({
-//       message: "User does not exist",
-//     })
-//   }
-
-//   return res.status(200).json(updatedUser)
-// })
-
-// userRouter.delete("/:id", async (req, res) => {
-//   const user = await deleteUser(req.params.id)
-//   if (!user) return res.status(404).json({ message: "User not found" })
-//   res.status(204).json()
-// })
-
-export default userRouter;

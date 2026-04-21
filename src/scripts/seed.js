@@ -27,9 +27,22 @@ async function seedUser() {
     location: u.location,
     plants: u.plants,
     history: u.history,
-  })) //slug: u.slug
+  }))
   await User.insertMany(toInsert)
   console.info("Users seeded")
+}
+
+async function seedPlaces() {
+  if ((await Place.countDocuments()) > 0) return
+  const placesFromFile = JSON.parse(await readFile(PLACES_PATH, "utf8"))
+  const toInsert = placesFromFile.map((t) => ({
+    _id: t._id,
+    city: t.city,
+    placeName: t.placeName,
+    coordinates: t.coordinates,
+  }))
+  await Place.insertMany(toInsert)
+  console.info("Places seeded")
 }
 
 async function seedPlants() {
@@ -60,29 +73,16 @@ async function seedTrades() {
     requesterId: t.requesterId,
     ownerId: t.ownerId,
     status: t.status,
-  })) //slug: u.slug
+  }))
   await Trade.insertMany(toInsert)
   console.info("Trades seeded")
 }
 
-async function seedPlaces() {
-  if ((await Place.countDocuments()) > 0) return
-  const placesFromFile = JSON.parse(await readFile(PLACES_PATH, "utf8"))
-  const toInsert = placesFromFile.map((t) => ({
-    _id: t._id,
-    city: t.city,
-    placeName: t.placeName,
-    coordinates: t.coordinates,
-  })) //slug: u.slug
-  await Place.insertMany(toInsert)
-  console.info("Places seeded")
-}
-
 async function seedIfEmpty() {
   await seedUser() // User first (plants reference by user)
+  await seedPlaces()
   await seedPlants()
   await seedTrades() // Trades last (Reference plants)
-  await seedPlaces()
 }
 
 // Standalone script: connect, seed, disconnect so process exits

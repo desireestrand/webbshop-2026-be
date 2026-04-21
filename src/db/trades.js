@@ -30,6 +30,7 @@ export async function getTradeById(id) {
 
 export async function getTradesByOwnerId(ownerId) {
   try {
+    //Looks for Trades matching ownerId on either ownerId in Trade or requesterId in Trade
     return await Trade.find({
       $or: [{ ownerId: ownerId }, { requesterId: ownerId }],
     })
@@ -68,10 +69,7 @@ export async function updateTrade(id, tradeData) {
     if (!updatedTrade) return null;
 
     if (tradeData.status === STATUS_LEVEL.cancelled) {
-      if (
-        updatedTrade.status !== STATUS_LEVEL.pending &&
-        updatedTrade.status !== STATUS_LEVEL.approved
-      ) {
+      if (updatedTrade.status !== STATUS_LEVEL.pending && updatedTrade.status !== STATUS_LEVEL.approved) {
         throw new Error("Trade can only be cancelled if status is pending or approved");
       }
 

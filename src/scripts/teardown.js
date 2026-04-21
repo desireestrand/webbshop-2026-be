@@ -11,8 +11,8 @@ async function teardown() {
   await connectToDatabase("webshop")
   await Trade.deleteMany() // Trade first (reference plant and user)
   await Plant.deleteMany()
-  await User.deleteMany()
   await Place.deleteMany()
+  await User.deleteMany()
   console.info("Database cleared")
   await disconnectFromDatabase() // Disconnect so process can exit
 }

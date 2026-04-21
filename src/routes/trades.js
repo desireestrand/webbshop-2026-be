@@ -96,12 +96,12 @@ tradeRouter.patch("/:id/status", requireAuth, validateUpdateTradeStatus, async (
       });
     }
 
-    // Kontrollera att användaren är en del av trade eller att användaren är admin
+    // Check if user is a part of the trade or admin
     if (trade.ownerId._id.toString() !== req.userId && trade.requesterId._id.toString() !== req.userId /* && req.userRole !== "admin" */) {
       return res.status(403).json({ message: "Not allowed to update trade status" });
     }
 
-    // Gör så att requestaren bara kan uppdatera till cancelled
+    // Makes requester only able to cancel trade
     if (trade.requesterId._id.toString() === req.userId && status !== "cancelled") {
       return res.status(403).json({ message: "Requester can only cancel trades" });
     }
@@ -118,6 +118,9 @@ tradeRouter.patch("/:id/status", requireAuth, validateUpdateTradeStatus, async (
   }
 });
 
+export default tradeRouter;
+
+// Replaced by cancelled logic
 // DELETE /trades/:id - Owner or Admin
 /* tradeRouter.delete("/:id", requireAuth,  validateIdParam, async (req, res) => {
   const id = req.params.id
@@ -130,7 +133,6 @@ tradeRouter.patch("/:id/status", requireAuth, validateUpdateTradeStatus, async (
       });
     }
 
-  // Kontrollera att användaren äger trade eller att användaren är admin
   if (trade.ownerId._id.toString() !== req.userId && trade.requesterId._id.toString() !== req.userId) { //&& req.userRole !== "admin"
     return res.status(403).json({ message: "Not allowed to delete trade" })
   } 
@@ -145,5 +147,3 @@ tradeRouter.patch("/:id/status", requireAuth, validateUpdateTradeStatus, async (
 
   return res.status(204).json()
 }) */
-
-export default tradeRouter;

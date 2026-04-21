@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema(
     },
     location: {
       type: [Number],
-      default: [0, 0],
+      // default: [0, 0],
       required: true,
     },
   },
@@ -180,31 +180,24 @@ userSchema.pre("validate", async function (next) {
       lower: true,
     });
 
-    console.log("baseSlug: ", baseSlug);
     let slug = baseSlug;
-    //Kolla om slug redan finns
-    const User = this.constructor; // means const User = mongoose.model("Plant");
+
+    // Same as const User = mongoose.model("Plant");
+    const User = this.constructor;
     let counter = 1;
-    //while slug exists in Users, run this code
+
+    // While slug exists in Users, run this code
     while (await User.exists({ slug })) {
       slug = `${baseSlug}-${counter}`;
       counter++;
     }
-    //change the value of slug, makes while-loop stop if new value does not exist
+    
+    // Change the value of slug, makes while-loop stop if new value does not exist
     this.slug = slug;
   }
 
   return next();
 });
-
-// Använder lowercase: true för email istället
-/* userSchema.pre("save", async function (next) {
-  if (!this.isModified("email")) {
-    return next();
-  }
-
-  this.email = this.email.toLowerCase();
-}) */
 
 userSchema.methods.isSamePassword = async function (password) {
   return await bcrypt.compare(password, this.password);

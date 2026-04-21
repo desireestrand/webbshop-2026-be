@@ -44,8 +44,8 @@ export async function getPlaceById(id) {
 export async function updatePlace(id, placeData) {
   try {
     return await Place.findByIdAndUpdate(id, placeData, {
-      new: true, // returnera den uppdaterade användaren
-      runValidators: true, // kontrollera att uppdateringen följer schemat
+      new: true,
+      runValidators: true, 
     })
   } catch (err) {
     console.error("Error updating 'Place':", err)

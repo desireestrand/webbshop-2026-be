@@ -13,10 +13,7 @@ const plantRules = () => [
       LIGHT_LEVELS.bright,
       LIGHT_LEVELS.directSun,
     ])
-    .withMessage(
-      "Light Levels must be one of: low, partial, bright, direct sun",
-    ),
- // body("ownerId").notEmpty().withMessage("OwnerId is required"),
+    .withMessage("Light Levels must be one of: low, partial, bright, direct sun"),
   body("coordinates")
     .notEmpty()
     .withMessage("Coordinates are required")
@@ -27,12 +24,11 @@ const plantRules = () => [
 
 export const validatePlant = plantRules();
 
-export const validatePlantUpdate = plantRules()
- // .filter((rule) => rule.builder.fields[0] !== "ownerId")
-  .map((rule) => rule.optional());
+export const validatePlantUpdate = plantRules().map((rule) => rule.optional());
 
 export function validatePlantResult(req, res, next) {
   const errors = validationResult(req);
+
   if (errors.isEmpty()) {
     return next();
   }

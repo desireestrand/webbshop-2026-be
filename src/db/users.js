@@ -55,7 +55,10 @@ export async function getUserBySlug(slug) {
         select: PLANT_INFO,
       });
   } catch (error) {
-    console.error(`Unable to read from 'Users' for slug ${slug}:`, error.message);
+    console.error(
+      `Unable to read from 'Users' for slug ${slug}:`,
+      error.message,
+    );
     throw error;
   }
 }
@@ -63,8 +66,8 @@ export async function getUserBySlug(slug) {
 export async function updateUser(id, userData) {
   try {
     return await User.findByIdAndUpdate(id, userData, {
-      new: true, // returnera den uppdaterade användaren
-      runValidators: true, // kontrollera att uppdateringen följer schemat
+      new: true,
+      runValidators: true,
     }).select(USER_INFO);
   } catch (error) {
     console.error(`Error updating 'User' for id ${id}:`, error.message);
@@ -72,7 +75,8 @@ export async function updateUser(id, userData) {
   }
 }
 
-export async function updateUserBySlug(slug, userData) {
+// Replaced by PATCH /auth/me
+/* export async function updateUserBySlug(slug, userData) {
   try {
     return await User.findOneAndUpdate({ slug }, userData, {
       new: true,
@@ -82,37 +86,33 @@ export async function updateUserBySlug(slug, userData) {
     console.error(`Error Updating 'User' for slug ${slug}:`, error.message);
     throw error;
   }
-}
-
-async function performCascadeDelete(userId) {
-  // 1. Återställ plantor från aktiva trades där användaren var requester
-  const requesterTrades = await Trade.find({
-    requesterId: userId,
-    status: { $in: ["pending", "approved"] },
-  });
-
-  for (const trade of requesterTrades) {
-    await Plant.findByIdAndUpdate(trade.plantId, { available: true });
-  }
-
-  // 2. Radera alla trades kopplade till användaren
-  await Trade.deleteMany({
-    $or: [{ requesterId: userId }, { ownerId: userId }],
-  });
-
-  // 3. Radera alla plantor användaren ägde
-  await Plant.deleteMany({ ownerId: userId });
-
-  // 4. Radera användaren
-  return await User.deleteOne({ _id: userId });
-}
+} */
 
 export async function deleteUser(id) {
   try {
     const user = await User.findById(id);
     if (!user) return null;
 
-    await performCascadeDelete(user._id);
+    // 1. Restore plants from active trades where user was requester
+    const requesterTrades = await Trade.find({
+      requesterId: user._id,
+      status: { $in: ["pending", "approved"] },
+    });
+
+    for (const trade of requesterTrades) {
+      await Plant.findByIdAndUpdate(trade.plantId, { available: true });
+    }
+
+    // 2. Delete all trades connected to user
+    await Trade.deleteMany({
+      $or: [{ requesterId: user._id }, { ownerId: user._id }],
+    });
+
+    // 3. Delete all plants owned by user
+    await Plant.deleteMany({ ownerId: user._id });
+
+    // 4. Delete user
+    return await User.deleteOne({ _id: user._id });
 
     return true;
   } catch (error) {
@@ -121,19 +121,16 @@ export async function deleteUser(id) {
   }
 }
 
-export async function deleteUserBySlug(slug) {
-  try {
-    const user = await User.findOne({ slug });
-    if (!user) return null;
+// Replaced by DELETE /auth/me
+// export async function deleteUserBySlug(slug) {
+//   try {
+//     const user = await User.findOne({ slug });
+//     if (!user) return null;
 
-    await performCascadeDelete(user._id);
-    return true;
-  } catch (error) {
-    console.error(`Unable to delete 'User' with slug ${slug}:`, error.message);
-    throw error;
-  }
-}
-
-export async function findUserByEmail(email) {
-  return await User.findOne({ email }).select("+password");
-}
+//     await performCascadeDelete(user._id);
+//     return true;
+//   } catch (error) {
+//     console.error(`Unable to delete 'User' with slug ${slug}:`, error.message);
+//     throw error;
+//   }
+// }

@@ -14,17 +14,17 @@ const tradeSchema = new mongoose.Schema(
     plantId: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Plant",
-      required: true, // Change to true later
+      required: true, 
     },
     requesterId: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "User",
-      required: true, // Change to true later
+      required: true, 
     },
     ownerId: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "User",
-      required: true, // Change to true later
+      required: true, 
     },
     status: {
       type: String,
@@ -67,6 +67,7 @@ tradeSchema.pre("validate", async function (next) {
       const error = new Error("Plant not found");
       return next(error);
     }
+
     this.ownerId = plant.ownerId;
   }
 
@@ -78,9 +79,8 @@ tradeSchema.pre("validate", async function (next) {
     });
 
     if (existingTrade) {
-      const error = new Error(
-        "You have already sent a trade request for this plant",
-      );
+      const error = new Error("You have already sent a trade request for this plant");
+
       return next(error);
     }
   }
@@ -93,29 +93,15 @@ tradeSchema.pre("validate", async function (next) {
   next();
 });
 
-/* tradeSchema.post("save", async function (next) {
-  if (this.isNew || this.isModified("status")) {
-    const user = await User.findById(this.ownerId).select("_id")
-    if (user) {
-      this.ownerId = user._id
-    }
-  }
-  next()
-}) */
-
 tradeSchema.post("save", async function () {
-  if (
-    this.status === STATUS_LEVEL.approved ||
-    this.status === STATUS_LEVEL.completed
-  ) {
+  if (this.status === STATUS_LEVEL.approved || this.status === STATUS_LEVEL.completed) {
     try {
-      await Plant.findByIdAndUpdate(this.plantId, {
-        available: false,
-      });
+      await Plant.findByIdAndUpdate(this.plantId, { available: false });
     } catch (error) {
       console.error("Error updating plant availability:", error);
     }
   }
+
   if (this.status === STATUS_LEVEL.completed) {
     try {
       await User.findByIdAndUpdate(this.ownerId, {
@@ -131,6 +117,7 @@ tradeSchema.post("save", async function () {
       console.error("Error updating user history:", err);
     }
   }
+
   if (this.status === STATUS_LEVEL.cancelled) {
     try {
       await Plant.findByIdAndUpdate(this.plantId, { available: true });
@@ -139,18 +126,16 @@ tradeSchema.post("save", async function () {
     }
   }
 
-  //Deletes all other trades with the same plant id if one trade is completed
+  // Deletes all other trades with the same plant id if one trade is completed
   if (this.status === STATUS_LEVEL.completed) {
     try {
       await this.constructor.deleteMany({
         plantId: this.plantId,
-        _id: { $ne: this._id }, //makes sure not to delete the current trade
-        status: { $ne: STATUS_LEVEL.completed }, //makes sure not to delete trades with the status completed
+        _id: { $ne: this._id }, // Makes sure not to delete the current trade
+        status: { $ne: STATUS_LEVEL.completed }, // Makes sure not to delete trades with the status completed
       });
     } catch (error) {
-      console.error(
-        "Could not clean up old trades for plantId " + this.plantId,
-      );
+      console.error("Could not clean up old trades for plantId " + this.plantId);
     }
   }
 });

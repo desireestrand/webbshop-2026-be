@@ -44,7 +44,6 @@ const plantSchema = new mongoose.Schema(
     },
     coordinates: {
       type: [Number],
-      // default: [0, 0],
       required: true,
     },
     meetingTime: {
@@ -80,22 +79,23 @@ const plantSchema = new mongoose.Schema(
 
 plantSchema.pre("validate", async function (next) {
   if (this.isModified("name")) {
-
     const baseSlug = slugify(this.name, {
       lower: true,
     });
 
-    console.log("baseSlug: ", baseSlug)
     let slug = baseSlug
-    //Kolla om slug redan finns
-    const Plant = this.constructor     // means const Plant = mongoose.model("Plant");
+
+    // Same as const Plant = mongoose.model("Plant");
+    const Plant = this.constructor
     let counter = 1;
-    //while slug exists in Plants, run this code
+
+    // While slug exists in Plants, run this code
     while(await Plant.exists({slug})){
       slug = `${baseSlug}-${counter}`
       counter++
     }
-    //change the value of slug, makes while-loop stop if new value does not exist
+
+    // Change the value of slug, makes while-loop stop if new value does not exist
     this.slug = slug
   }
 

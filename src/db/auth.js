@@ -19,10 +19,11 @@ function _generateTokens(user) {
 }
 
 function _getUserObject(user) {
-  /*   const userObject = user.toObject()
-  delete userObject.password
-  return userObject */
   return user.toJSON();
+}
+
+export async function findUserByEmail(email) {
+  return await User.findOne({ email }).select("+password");
 }
 
 export async function registerUser(name, email, password, location) {
@@ -37,9 +38,8 @@ export async function registerUser(name, email, password, location) {
 }
 
 export async function logInUser(email, password) {
-  const user = await User.findOne({ email: email.toLowerCase() }).select(
-    "+password", //gör så att man ska kunna få password
-  );
+  // +password makes select true(makes password available to get)
+  const user = await User.findOne({ email: email.toLowerCase() }).select("+password");
 
   const response = "Invalid credentials";
 
