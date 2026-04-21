@@ -21,13 +21,6 @@ plantRouter.get("/", async (req, res) => {
   try {
     const { q } = req.query;
     const plants = await getAvailablePlants(q);
-
-    if (plants.length === 0) {
-      return res.status(404).json({
-        message: "No plants found",
-      });
-    }
-
     return res.json(plants);
   } catch (error) {
     return res.status(500).json({ message: "Error while fetching plants" });
@@ -39,13 +32,6 @@ plantRouter.get("/all", requireAuth, /* requireAdmin */ async (req, res) => {
   try {
     const { q } = req.query;
     const plants = await getAllPlants(q);
-
-    if (plants.length === 0) {
-      return res.status(404).json({
-        message: "No plants found",
-      });
-    }
-
     return res.json(plants);
   } catch (error) {
     return res.status(500).json({ message: "Error while fetching all plants" });
@@ -56,13 +42,6 @@ plantRouter.get("/all", requireAuth, /* requireAdmin */ async (req, res) => {
 plantRouter.get("/mine", requireAuth, async (req, res) => {
   try {
     const myPlants = await getPlantsByOwnerId(req.userId);
-
-    if (myPlants.length === 0) {
-      return res.status(404).json({
-        message: "No plants found",
-      });
-    }
-
     return res.json(myPlants);
   } catch (error) {
     return res.status(500).json({ message: "Error while fetching your plants" });

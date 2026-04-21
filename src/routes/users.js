@@ -18,13 +18,6 @@ userRouter.get("/", requireAuth, /* requireAdmin */ async (req, res) => {
   try {
     const { q } = req.query;
     const users = await getUsers(q);
-
-    if (users.length === 0) {
-      return res.status(404).json({
-        message: "No users found",
-      });
-    }
-
     return res.json(users);
   } catch (error) {
     return res.status(500).json({ message: "Error while fetching users" });
