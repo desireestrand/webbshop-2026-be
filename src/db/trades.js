@@ -33,7 +33,8 @@ export async function getTradesByOwnerId(ownerId) {
     //Looks for Trades matching ownerId on EITHER ownerId in Trade or requesterId in Trade
     return await Trade.find({
       $or: [{ ownerId: ownerId }, { requesterId: ownerId }],
-    })
+    }) 
+      .sort({ updatedAt: -1 })
       .populate("plantId", PLANT_INFO)
       .populate("ownerId", USER_INFO)
       .populate("requesterId", USER_INFO);
