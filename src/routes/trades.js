@@ -20,13 +20,6 @@ const tradeRouter = Router();
 tradeRouter.get("/", requireAuth, /* requireAdmin */ async (req, res) => {
   try {
     const trades = await getAllTrades();
-
-    if (trades.length === 0) {
-      return res.status(404).json({
-        message: "No trades found",
-      });
-    }
-
     return res.json(trades);
   } catch (error) {
     return res.status(500).json({ message: "Error while fetching trades" });
