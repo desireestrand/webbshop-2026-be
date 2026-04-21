@@ -3,6 +3,7 @@ import { verifyAccessToken } from "../utils/tokens.js";
 export function requireAuth(req, res, next) {
   try {
     const header = req.headers?.authorization;
+    //to save the accessToken from headers.authorization if it exists
     const token = header?.split(" ")?.[1];
 
     if (!token) {

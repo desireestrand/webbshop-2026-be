@@ -1,6 +1,23 @@
 import { body, validationResult } from "express-validator";
 import { LIGHT_LEVELS } from "../models/Plant.js";
 
+export function validatePlantResult(req, res, next) {
+  const errors = validationResult(req);
+
+  if (errors.isEmpty()) {
+    return next();
+  }
+
+  const formattedErrors = errors.array().map((err) => ({
+    field: err.path,
+    message: err.msg,
+  }));
+
+  return res.status(400).json({
+    errors: formattedErrors,
+  });
+}
+
 const plantRules = () => [
   body("name").notEmpty().withMessage("Name is required"),
   body("image").notEmpty().withMessage("Image is required"),
@@ -22,23 +39,12 @@ const plantRules = () => [
   body("meetingTime").notEmpty().withMessage("Meeting time is required"),
 ];
 
-export const validatePlant = plantRules();
+export const validatePlant = [
+  ...plantRules(),
+  validatePlantResult
+];
 
-export const validatePlantUpdate = plantRules().map((rule) => rule.optional());
-
-export function validatePlantResult(req, res, next) {
-  const errors = validationResult(req);
-
-  if (errors.isEmpty()) {
-    return next();
-  }
-
-  const formattedErrors = errors.array().map((err) => ({
-    field: err.path,
-    message: err.msg,
-  }));
-
-  return res.status(400).json({
-    errors: formattedErrors,
-  });
-}
+export const validatePlantUpdate = [
+  ...plantRules().map((rule) => rule.optional()),
+  validatePlantResult
+];

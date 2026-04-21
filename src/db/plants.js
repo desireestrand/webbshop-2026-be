@@ -70,6 +70,7 @@ export async function createPlant(plantData) {
 export async function updatePlantBySlug(slug, updateData) {
   try {
     const updatedPlant = await Plant.findOneAndUpdate({ slug }, updateData, {
+      //new returns the changed Plant and runValidators runs through to check rules from Plant schema
       new: true,
       runValidators: true,
     }).populate("ownerId", OWNER_ADMIN_INFO);
