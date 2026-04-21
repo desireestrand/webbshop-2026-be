@@ -47,7 +47,7 @@ const plantSchema = new mongoose.Schema(
       required: true,
     },
     meetingTime: {
-      type: String, // Change to date later
+      type: Date,
       required: true,
     },
     available: {

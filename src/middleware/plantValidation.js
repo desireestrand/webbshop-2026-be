@@ -36,15 +36,24 @@ const plantRules = () => [
     .withMessage("Coordinates are required")
     .isArray({ min: 2, max: 2 })
     .withMessage("Array has to contain two elements"),
-  body("meetingTime").notEmpty().withMessage("Meeting time is required"),
+  body("meetingTime")
+    .notEmpty()
+    .withMessage("Meeting time is required")
+    .isISO8601()
+    .withMessage("Must be a valid ISO8601 date")
+    .toDate()
+    .custom((value) => {
+      if (new Date(value) < new Date()) {
+        throw new Error("Meeting time cannot be in the past");
+      }
+      
+      return true;
+    }),
 ];
 
-export const validatePlant = [
-  ...plantRules(),
-  validatePlantResult
-];
+export const validatePlant = [...plantRules(), validatePlantResult];
 
 export const validatePlantUpdate = [
   ...plantRules().map((rule) => rule.optional()),
-  validatePlantResult
+  validatePlantResult,
 ];

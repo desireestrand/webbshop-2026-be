@@ -39,7 +39,6 @@ const userSchema = new mongoose.Schema(
     },
     location: {
       type: [Number],
-      // default: [0, 0],
       required: true,
     },
   },
