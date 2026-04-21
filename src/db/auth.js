@@ -22,6 +22,7 @@ function _getUserObject(user) {
   return user.toJSON();
 }
 
+// +password makes select true (makes password available to get)
 export async function findUserByEmail(email) {
   return await User.findOne({ email }).select("+password");
 }
@@ -38,7 +39,6 @@ export async function registerUser(name, email, password, location) {
 }
 
 export async function logInUser(email, password) {
-  // +password makes select true(makes password available to get)
   const user = await User.findOne({ email: email.toLowerCase() }).select("+password");
 
   const response = "Invalid credentials";

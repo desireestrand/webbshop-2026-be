@@ -1,7 +1,6 @@
 import { Router } from "express";
 import {
   validatePlant,
-  validatePlantResult,
   validatePlantUpdate,
 } from "../middleware/plantValidation.js";
 import {
@@ -89,7 +88,7 @@ plantRouter.get("/:slug", requireAuth, async (req, res) => {
 });
 
 // POST /plants - Auth
-plantRouter.post("/", requireAuth, validatePlant, validatePlantResult, async (req, res) => {
+plantRouter.post("/", requireAuth, validatePlant, async (req, res) => {
   try {
     const plantData = {
       ...req.body,
@@ -104,7 +103,7 @@ plantRouter.post("/", requireAuth, validatePlant, validatePlantResult, async (re
 });
 
 // PATCH /plants/:slug - Owner or Admin
-plantRouter.patch("/:slug", requireAuth, validatePlantUpdate, validatePlantResult, async (req, res) => {
+plantRouter.patch("/:slug", requireAuth, validatePlantUpdate, async (req, res) => {
   try {
     const slug = req.params.slug;
     const plant = await getPlantBySlug(slug);

@@ -58,15 +58,10 @@ const plantSchema = new mongoose.Schema(
   },
  {
     timestamps: true,
+    /*allows virtuals and
+    hides duplicate id and unwanted info when
+    sending JSON via API calls*/
     toJSON: {
-      virtuals: true,
-      transform: (doc, ret) => {
-        delete ret.__v;
-        delete ret.id;
-        return ret;
-      },
-    },
-    toObject: {
       virtuals: true,
       transform: (doc, ret) => {
         delete ret.__v;

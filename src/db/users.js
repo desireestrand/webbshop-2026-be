@@ -66,6 +66,7 @@ export async function getUserBySlug(slug) {
 export async function updateUser(id, userData) {
   try {
     return await User.findByIdAndUpdate(id, userData, {
+      //new returns the changed User and runValidators runs through to check rules from User schema
       new: true,
       runValidators: true,
     }).select(USER_INFO);

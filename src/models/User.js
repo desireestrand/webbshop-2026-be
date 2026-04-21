@@ -52,35 +52,11 @@ const userSchema = new mongoose.Schema(
         delete ret.resetPasswordCode;
         delete ret.__v;
         delete ret.id;
-
+        //to hide activeTrades if there are no active trades registered
         if (!ret.activeTrades || ret.activeTrades.length === 0) {
           delete ret.activeTrades;
         }
-
-        if (!ret.history || ret.history.length === 0) {
-          delete ret.history;
-        }
-
-        delete ret._activeOwner;
-        delete ret._activeRequester;
-        delete ret._completedOwner;
-        delete ret._completedRequester;
-
-        return ret;
-      },
-    },
-    toObject: {
-      virtuals: true,
-      transform: (doc, ret) => {
-        delete ret.password;
-        delete ret.resetPasswordCode;
-        delete ret.__v;
-        delete ret.id;
-
-        if (!ret.activeTrades || ret.activeTrades.length === 0) {
-          delete ret.activeTrades;
-        }
-
+         //to hide history if there is no history registered
         if (!ret.history || ret.history.length === 0) {
           delete ret.history;
         }

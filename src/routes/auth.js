@@ -1,7 +1,6 @@
 import { Router } from "express"
 import {
   validateRegister,
-  validateAuthResult,
   validateLogin,
   validateResetPassword,
 } from "../middleware/authValidation.js"
@@ -75,7 +74,7 @@ authRouter.delete("/me", requireAuth, async (req, res) => {
 })
 
 // POST /auth/register
-authRouter.post("/register", validateRegister, validateAuthResult, async (req, res) => {
+authRouter.post("/register", validateRegister, async (req, res) => {
   try {
     const { name, email, password, location } = req.body
 
@@ -100,7 +99,7 @@ authRouter.post("/register", validateRegister, validateAuthResult, async (req, r
 });
 
 // POST /auth/login
-authRouter.post("/login", validateLogin, validateAuthResult, async (req, res) => {
+authRouter.post("/login", validateLogin, async (req, res) => {
   try {
     const { email, password } = req.body
     
@@ -155,7 +154,7 @@ authRouter.post("/reset-password/request", async (req, res) => {
   return res.json(result)
 })
 
-authRouter.patch("/reset-password/confirm", validateResetPassword, validateAuthResult, async (req, res) => {
+authRouter.patch("/reset-password/confirm", validateResetPassword, async (req, res) => {
   const { email, code } = req.query
 
   if (!email || !code) {
