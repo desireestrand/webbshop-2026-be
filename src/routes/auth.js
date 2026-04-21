@@ -51,7 +51,7 @@ authRouter.patch("/me", requireAuth, validateUpdateUser, async (req, res) => {
 
     return res.status(200).json(updatedUser)
   } catch (error) {
-    res.status(500).json({ message: "Could not update profile" });
+    res.status(500).json({ message: "Could not update profile" })
   }
 })
 
@@ -67,9 +67,9 @@ authRouter.delete("/me", requireAuth, async (req, res) => {
       })
     }
 
-    return res.status(204).json();
+    return res.status(204).json()
   } catch (error) {
-    res.status(500).json({ message: "Error while deleting account" });
+    res.status(500).json({ message: "Error while deleting account" })
   }
 })
 
@@ -92,24 +92,23 @@ authRouter.post("/register", validateRegister, async (req, res) => {
       location,
     )
 
-    return res.status(201).json({ accessToken, refreshToken })
+    return res.status(201).json({ user, accessToken, refreshToken })
   } catch (error) {
-    res.status(500).json({ message: "Registration failed", error: error.message })
+    res
+      .status(500)
+      .json({ message: "Registration failed", error: error.message })
   }
-});
+})
 
 // POST /auth/login
 authRouter.post("/login", validateLogin, async (req, res) => {
   try {
     const { email, password } = req.body
-    
-    // Returns user, accessToken and refreshToken based on logged in User
-    const { user, accessToken, refreshToken } = await logInUser(
-      email,
-      password,
-    )
 
-    return res.json({ accessToken, refreshToken })
+    // Returns user, accessToken and refreshToken based on logged in User
+    const { user, accessToken, refreshToken } = await logInUser(email, password)
+
+    return res.json({ user, accessToken, refreshToken })
   } catch (error) {
     return res.status(401).json({ message: "Invalid credentials" })
   }
@@ -154,31 +153,35 @@ authRouter.post("/reset-password/request", async (req, res) => {
   return res.json(result)
 })
 
-authRouter.patch("/reset-password/confirm", validateResetPassword, async (req, res) => {
-  const { email, code } = req.query
+authRouter.patch(
+  "/reset-password/confirm",
+  validateResetPassword,
+  async (req, res) => {
+    const { email, code } = req.query
 
-  if (!email || !code) {
-    return res.status(400).json({
-      message: "Email and Code query params is required",
-    })
-  }
+    if (!email || !code) {
+      return res.status(400).json({
+        message: "Email and Code query params is required",
+      })
+    }
 
-  const { password } = req.body
+    const { password } = req.body
 
-  if (!password) {
-    return res.status(400).json({
-      message: "Password is required",
-    })
-  }
+    if (!password) {
+      return res.status(400).json({
+        message: "Password is required",
+      })
+    }
 
-  try {
-    const result = await confirmPasswordReset(email, code, password)
-    return res.json(result)
-  } catch (error) {
-    return res.status(401).json({
-      message: "Unable to reset password",
-    })
-  }
-})
+    try {
+      const result = await confirmPasswordReset(email, code, password)
+      return res.json(result)
+    } catch (error) {
+      return res.status(401).json({
+        message: "Unable to reset password",
+      })
+    }
+  },
+)
 
 export default authRouter
