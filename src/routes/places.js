@@ -11,10 +11,12 @@ import {
   validatePlaceResult,
   validateUpdatePlace,
 } from "../middleware/placeValidation.js"
+import { requireAuth } from "../middleware/auth.js"
 
 const placeRouter = Router()
 
-placeRouter.get("/", async (req, res) => {
+// GET /places - Auth
+placeRouter.get("/", requireAuth, async (req, res) => {
   const { q } = req.query
 
   const places = await getPlaces(q)
@@ -22,7 +24,8 @@ placeRouter.get("/", async (req, res) => {
   res.json(places)
 })
 
-placeRouter.post("/", validatePlace, validatePlaceResult, async (req, res) => {
+// POST /places - Auth
+placeRouter.post("/", requireAuth, validatePlace, validatePlaceResult, async (req, res) => {
   const placeData = {
     ...req.body,
   }
@@ -32,22 +35,19 @@ placeRouter.post("/", validatePlace, validatePlaceResult, async (req, res) => {
   res.status(201).json(place)
 })
 
-placeRouter.patch(
-  "/id/:id",
-  validateUpdatePlace,
-  validatePlaceResult,
-  async (req, res) => {
-    const place = await updatePlace(req.params.id, req.body)
+// PATCH /places/id/:id - Auth
+placeRouter.patch("/id/:id", requireAuth, validateUpdatePlace, validatePlaceResult, async (req, res) => {
+  const place = await updatePlace(req.params.id, req.body)
 
-    if (!place) {
-      return res.status(404).json({ message: "Place not found" })
-    }
+  if (!place) {
+    return res.status(404).json({ message: "Place not found" })
+  }
 
-    res.status(200).json(place)
-  },
-)
+  res.status(200).json(place)
+})
 
-placeRouter.delete("/id/:id", async (req, res) => {
+// DELETE /places/id/:id - Auth
+placeRouter.delete("/id/:id", requireAuth, async (req, res) => {
   const { id } = req.params
   console.log("sees id as: ", id)
 

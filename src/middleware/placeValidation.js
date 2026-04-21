@@ -22,11 +22,12 @@ const updatePlaceRules = () => [
     .isArray({ min: 2, max: 2 })
     .withMessage("Array has to contain two elements"),
 ]
+
 export const validateUpdatePlace = updatePlaceRules()
 
-//needed to print out the errors
 export function validatePlaceResult(req, res, next) {
   const errors = validationResult(req)
+  
   if (errors.isEmpty()) {
     return next()
   }

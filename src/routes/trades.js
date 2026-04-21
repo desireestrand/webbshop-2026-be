@@ -1,4 +1,4 @@
-import { Router } from "express"
+import { Router } from "express";
 import {
   getAllTrades,
   getTradeById,
@@ -6,121 +6,122 @@ import {
   deleteTrade,
   updateTrade,
   getTradesByOwnerId,
-} from "../db/trades.js"
+} from "../db/trades.js";
 import {
   validateCreateTrade,
   validateIdParam,
   validateUpdateTradeStatus,
-} from "../middleware/tradeValidation.js"
-import { requireAdmin, requireAuth } from "../middleware/auth.js"
+} from "../middleware/tradeValidation.js";
+import { requireAdmin, requireAuth } from "../middleware/auth.js";
 
-const tradeRouter = Router()
+const tradeRouter = Router();
 
-// GET /trades
-tradeRouter.get(
-  "/",
-  requireAuth,
-  /*requireAdmin*/ async (req, res) => {
-    const trades = await getAllTrades()
+// GET /trades - Admin
+tradeRouter.get("/", requireAuth, /* requireAdmin */ async (req, res) => {
+  try {
+    const trades = await getAllTrades();
 
-    res.json(trades)
-  },
-)
+    if (trades.length === 0) {
+      return res.status(404).json({
+        message: "No trades found",
+      });
+    }
 
-// GET /trades/mine
-tradeRouter.get("/mine", requireAuth, async (req, res) => {
-  const myTrades = await getTradesByOwnerId(req.userId)
-
-  if (!myTrades) {
-    return res.status(404).json({
-      message: "Your trades not found",
-    })
+    return res.json(trades);
+  } catch (error) {
+    return res.status(500).json({ message: "Error while fetching trades" });
   }
+});
 
-  res.json(myTrades)
-})
+// GET /trades/mine - Current user
+tradeRouter.get("/mine", requireAuth, async (req, res) => {
+  try {
+    const myTrades = await getTradesByOwnerId(req.userId);
 
-// GET /trades/:id
-tradeRouter.get(
-  "/:id",
-  requireAuth,
-  /*requireAdmin*/ validateIdParam,
-  async (req, res) => {
-    const id = req.params.id
-    const trade = await getTradeById(id)
+    if (!myTrades || myTrades.length === 0) {
+      return res.status(404).json({
+        message: "No trades found",
+      });
+    }
+
+    return res.json(myTrades);
+  } catch (error) {
+    return res.status(500).json({ message: "Error while fetching your trades" });
+  }
+});
+
+// GET /trades/:id - Admin
+tradeRouter.get("/:id", requireAuth, /* requireAdmin */ validateIdParam, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const trade = await getTradeById(id);
 
     if (!trade) {
       return res.status(404).json({
         message: "Trade not found",
-      })
+      });
     }
 
-    res.json(trade)
-  },
-)
-
-// POST /trades
-tradeRouter.post("/", requireAuth, validateCreateTrade, async (req, res) => {
-  const requesterId = req.userId
-  const { plantId } = req.body
-
-  try {
-    const trade = await createTrade({ plantId, requesterId })
-    res.status(201).json(trade)
-  } catch (err) {
-    return res.status(400).json({ message: err.message })
+    return res.json(trade);
+  } catch (error) {
+    res.status(500).json({ message: "Error while fetching the trade" });
   }
-})
+});
 
-// PATCH /trades/:id/status
-tradeRouter.patch(
-  "/:id/status",
-  requireAuth,
-  validateUpdateTradeStatus,
-  async (req, res) => {
-    try {
-      const id = req.params.id
-      const status = req.body.status
+// POST /trades - Auth
+tradeRouter.post("/", requireAuth, validateCreateTrade, async (req, res) => {
+  try {
+    const requesterId = req.userId;
+    const { plantId } = req.body;
 
-      const trade = await getTradeById(id)
+    const trade = await createTrade({ plantId, requesterId });
 
-      if (!trade) {
-        return res.status(404).json({
-          message: "Trade not found",
-        })
-      }
+    return res.status(201).json(trade);
+  } catch (error) {
+    return res.status(400).json({ message: error.message || "Could not create trade" });
+  }
+});
 
-      // Kontrollera att användaren är en del av trade eller att användaren är admin
-      if (
-        trade.ownerId._id.toString() !== req.userId &&
-        trade.requesterId._id.toString() !==
-          req.userId /*&& req.userRole !== "admin"*/
-      ) {
-        return res.status(403).json({ message: "Not allowed to update trade" })
-      }
+// PATCH /trades/:id/status - Owner, Requester or Admin
+tradeRouter.patch("/:id/status", requireAuth, validateUpdateTradeStatus, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const status = req.body.status;
 
-      // Gör så att requestaren bara kan uppdatera till cancelled
-      if (
-        trade.requesterId._id.toString() === req.userId &&
-        status !== "cancelled"
-      ) {
-        return res.status(403).json({ message: "Not allowed to update trade" })
-      }
-      const updatedTrade = await updateTrade(id, { status })
+    const trade = await getTradeById(id);
 
-      if (!updatedTrade) {
-        return res.status(404).json({
-          message: "Trade does not exist",
-        })
-      }
-      return res.status(200).json(updatedTrade)
-    } catch (err) {
-      return res.status(400).json({ message: err.message })
+    if (!trade) {
+      return res.status(404).json({
+        message: "Trade not found",
+      });
     }
-  },
-)
 
-// DELETE /trades/:id
+    // Check if user is a part of the trade or admin
+    if (trade.ownerId._id.toString() !== req.userId && trade.requesterId._id.toString() !== req.userId /* && req.userRole !== "admin" */) {
+      return res.status(403).json({ message: "Not allowed to update trade status" });
+    }
+
+    // Makes requester only able to cancel trade
+    if (trade.requesterId._id.toString() === req.userId && status !== "cancelled") {
+      return res.status(403).json({ message: "Requester can only cancel trades" });
+    }
+
+    const updatedTrade = await updateTrade(id, { status });
+
+    if (updatedTrade.cancelled) {
+      return res.status(200).json({ message: "Trade cancelled and deleted" });
+    }
+
+    return res.status(200).json(updatedTrade);
+  } catch (error) {
+    return res.status(500).json({ message: "Error while updating trade status" });
+  }
+});
+
+export default tradeRouter;
+
+// Replaced by cancelled logic
+// DELETE /trades/:id - Owner or Admin
 /* tradeRouter.delete("/:id", requireAuth,  validateIdParam, async (req, res) => {
   const id = req.params.id
 
@@ -132,7 +133,6 @@ tradeRouter.patch(
       });
     }
 
-  // Kontrollera att användaren äger trade eller att användaren är admin
   if (trade.ownerId._id.toString() !== req.userId && trade.requesterId._id.toString() !== req.userId) { //&& req.userRole !== "admin"
     return res.status(403).json({ message: "Not allowed to delete trade" })
   } 
@@ -147,5 +147,3 @@ tradeRouter.patch(
 
   return res.status(204).json()
 }) */
-
-export default tradeRouter
