@@ -2,46 +2,118 @@
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c001",
     "name": "Amara Okafor",
-    "email": "amara.okafor@example.com",
     "slug": "amara-okafor",
+    "email": "amara.okafor@example.com",
     "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "admin",
-    "location": [59.3251, 18.0712]
+    "location": [59.3341, 18.0645]
   },
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c002",
     "name": "Kim Nguyen",
-    "email": "kim.n@gardenmail.com",
     "slug": "kim-nguyen",
+    "email": "kim.n@gardenmail.com",
     "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "user",
-    "location": [59.3168, 18.0741]
+    "location": [59.3345, 18.0652]
   },
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c003",
     "name": "Mateo Rossi",
-    "email": "mateo.rossi@provider.se",
     "slug": "mateo-rossi",
+    "email": "mateo.rossi@provider.se",
     "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "user",
-    "location": [59.321, 18.0585]
+    "location": [59.3125, 18.0835]
   },
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c004",
     "name": "Linnéa Björk",
-    "email": "linnea.b@vaxtpost.se",
     "slug": "linnea-bjork",
+    "email": "linnea.b@vaxtpost.se",
     "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "user",
-    "location": [59.3412, 18.021]
+    "location": [59.3128, 18.0842]
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c012",
+    "name": "Sofia Lindström",
+    "slug": "sofia-lindstrom",
+    "email": "sofia.l@garden.se",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
+    "role": "user",
+    "location": [59.3122, 18.0830]
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c011",
+    "name": "Mikael Persson",
+    "slug": "mikael-persson",
+    "email": "mikael.p@söderpost.se",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
+    "role": "user",
+    "location": [59.3175, 18.0510]
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c013",
+    "name": "Jonas Berg",
+    "slug": "jonas-berg",
+    "email": "jonas.b@knivsoder.se",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
+    "role": "user",
+    "location": [59.3178, 18.0515]
   },
   {
     "_id": "65f1a2b3c4d5e6f7a8b9c005",
     "name": "Erik Sandqvist",
-    "email": "erik.sand@hmail.com",
     "slug": "erik-sandqvist",
+    "email": "erik.sand@hmail.com",
     "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
     "role": "user",
-    "location": [59.335, 18.082]
+    "location": [59.2970, 18.0410]
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c010",
+    "name": "Lars-Erik Holm",
+    "slug": "lars-erik-holm",
+    "email": "lars.holm@arsta.se",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
+    "role": "user",
+    "location": [59.2972, 18.0415]
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c009",
+    "name": "Yasmine Bergqvist",
+    "slug": "yasmine-bergqvist",
+    "email": "yasmine.b@solna.se",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
+    "role": "user",
+    "location": [59.2968, 18.0405]
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c006",
+    "name": "Malik Lindberg",
+    "slug": "malik-lindberg",
+    "email": "malik.l@u-mail.se",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
+    "role": "user",
+    "location": [59.2815, 18.0320]
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c007",
+    "name": "Sara Ahmed",
+    "slug": "sara-ahmed",
+    "email": "sara.ahmed@sumpan.se",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
+    "role": "user",
+    "location": [59.2812, 18.0315]
+  },
+  {
+    "_id": "65f1a2b3c4d5e6f7a8b9c008",
+    "name": "Oscar Johansson",
+    "slug": "oscar-johansson",
+    "email": "oscar.j@sthlm.se",
+    "password": "$2b$10$Diz2P4xyioeaY4Pv5ZNed.SfFuG8UJoRo7ddZzvTSiS4.NnwcRWee",
+    "role": "user",
+    "location": [59.2818, 18.0325]
   }
 ]
